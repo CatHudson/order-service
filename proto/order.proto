@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package order.v1;
+
+import "types.proto";
+
+option go_package = "github.com/cathudson/order-service/internal/generated";
+
+message Order {
+  UUID id = 1;
+  UUID account_id = 2;
+  UUID idempotency_key = 3;
+  UUID instrument_id = 4;
+  int64 amount = 5;
+  OrderStatus status = 6;
+}
