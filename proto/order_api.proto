@@ -2,20 +2,39 @@ syntax = "proto3";
 
 package order.v1;
 
+import "types.proto";
+import "order.proto";
+
 option go_package = "github.com/cathudson/order-service/internal/generated";
 
 service OrderService {
   rpc GetHealth(GetHealthRequest) returns (GetHealthResponse);
+  rpc CreateOrder(CreateOrderRequest) returns (CreateOrderResponse);
+  rpc GetOrder(GetOrderRequest) returns (GetOrderResponse);
+}
+
+message CreateOrderRequest {
+  UUID instrument_id = 1;
+  UUID account_id = 2;
+  UUID idempotency_key = 3;
+  int64 amount = 4;
+}
+
+message CreateOrderResponse {
+  UUID id = 1;
+  OrderStatus status = 2;
+}
+
+message GetOrderRequest {
+  UUID id = 1;
+}
+
+message GetOrderResponse {
+  Order order = 1;
 }
 
 message GetHealthRequest {}
 
 message GetHealthResponse {
   HealthStatus status = 1;
-}
-
-enum HealthStatus {
-  HEALTH_STATUS_UNSPECIFIED = 0;
-  HEALTH_STATUS_OK = 1;
-  HEALTH_STATUS_NOT_OK = 2;
 }

@@ -6,6 +6,7 @@ import (
 
 	grpcApp "github.com/cathudson/order-service/internal/app"
 	"github.com/cathudson/order-service/internal/generated"
+	"github.com/cathudson/order-service/internal/store"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 )
@@ -19,7 +20,8 @@ func main() {
 	}
 	defer listener.Close()
 
-	app := grpcApp.New()
+	orderStore := store.NewOrderStore()
+	app := grpcApp.New(orderStore)
 	server := grpc.NewServer()
 	generated.RegisterOrderServiceServer(server, app)
 	reflection.Register(server)

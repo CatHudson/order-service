@@ -21,53 +21,212 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-type HealthStatus int32
+type CreateOrderRequest struct {
+	state          protoimpl.MessageState `protogen:"open.v1"`
+	InstrumentId   *UUID                  `protobuf:"bytes,1,opt,name=instrument_id,json=instrumentId,proto3" json:"instrument_id,omitempty"`
+	AccountId      *UUID                  `protobuf:"bytes,2,opt,name=account_id,json=accountId,proto3" json:"account_id,omitempty"`
+	IdempotencyKey *UUID                  `protobuf:"bytes,3,opt,name=idempotency_key,json=idempotencyKey,proto3" json:"idempotency_key,omitempty"`
+	Amount         int64                  `protobuf:"varint,4,opt,name=amount,proto3" json:"amount,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
+}
 
-const (
-	HealthStatus_HEALTH_STATUS_UNSPECIFIED HealthStatus = 0
-	HealthStatus_HEALTH_STATUS_OK          HealthStatus = 1
-	HealthStatus_HEALTH_STATUS_NOT_OK      HealthStatus = 2
-)
+func (x *CreateOrderRequest) Reset() {
+	*x = CreateOrderRequest{}
+	mi := &file_order_api_proto_msgTypes[0]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
 
-// Enum value maps for HealthStatus.
-var (
-	HealthStatus_name = map[int32]string{
-		0: "HEALTH_STATUS_UNSPECIFIED",
-		1: "HEALTH_STATUS_OK",
-		2: "HEALTH_STATUS_NOT_OK",
+func (x *CreateOrderRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CreateOrderRequest) ProtoMessage() {}
+
+func (x *CreateOrderRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_order_api_proto_msgTypes[0]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
 	}
-	HealthStatus_value = map[string]int32{
-		"HEALTH_STATUS_UNSPECIFIED": 0,
-		"HEALTH_STATUS_OK":          1,
-		"HEALTH_STATUS_NOT_OK":      2,
-	}
-)
-
-func (x HealthStatus) Enum() *HealthStatus {
-	p := new(HealthStatus)
-	*p = x
-	return p
+	return mi.MessageOf(x)
 }
 
-func (x HealthStatus) String() string {
-	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
-}
-
-func (HealthStatus) Descriptor() protoreflect.EnumDescriptor {
-	return file_order_api_proto_enumTypes[0].Descriptor()
-}
-
-func (HealthStatus) Type() protoreflect.EnumType {
-	return &file_order_api_proto_enumTypes[0]
-}
-
-func (x HealthStatus) Number() protoreflect.EnumNumber {
-	return protoreflect.EnumNumber(x)
-}
-
-// Deprecated: Use HealthStatus.Descriptor instead.
-func (HealthStatus) EnumDescriptor() ([]byte, []int) {
+// Deprecated: Use CreateOrderRequest.ProtoReflect.Descriptor instead.
+func (*CreateOrderRequest) Descriptor() ([]byte, []int) {
 	return file_order_api_proto_rawDescGZIP(), []int{0}
+}
+
+func (x *CreateOrderRequest) GetInstrumentId() *UUID {
+	if x != nil {
+		return x.InstrumentId
+	}
+	return nil
+}
+
+func (x *CreateOrderRequest) GetAccountId() *UUID {
+	if x != nil {
+		return x.AccountId
+	}
+	return nil
+}
+
+func (x *CreateOrderRequest) GetIdempotencyKey() *UUID {
+	if x != nil {
+		return x.IdempotencyKey
+	}
+	return nil
+}
+
+func (x *CreateOrderRequest) GetAmount() int64 {
+	if x != nil {
+		return x.Amount
+	}
+	return 0
+}
+
+type CreateOrderResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            *UUID                  `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Status        OrderStatus            `protobuf:"varint,2,opt,name=status,proto3,enum=order.v1.OrderStatus" json:"status,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CreateOrderResponse) Reset() {
+	*x = CreateOrderResponse{}
+	mi := &file_order_api_proto_msgTypes[1]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CreateOrderResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CreateOrderResponse) ProtoMessage() {}
+
+func (x *CreateOrderResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_order_api_proto_msgTypes[1]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CreateOrderResponse.ProtoReflect.Descriptor instead.
+func (*CreateOrderResponse) Descriptor() ([]byte, []int) {
+	return file_order_api_proto_rawDescGZIP(), []int{1}
+}
+
+func (x *CreateOrderResponse) GetId() *UUID {
+	if x != nil {
+		return x.Id
+	}
+	return nil
+}
+
+func (x *CreateOrderResponse) GetStatus() OrderStatus {
+	if x != nil {
+		return x.Status
+	}
+	return OrderStatus_ORDER_STATUS_UNSPECIFIED
+}
+
+type GetOrderRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            *UUID                  `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetOrderRequest) Reset() {
+	*x = GetOrderRequest{}
+	mi := &file_order_api_proto_msgTypes[2]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetOrderRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetOrderRequest) ProtoMessage() {}
+
+func (x *GetOrderRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_order_api_proto_msgTypes[2]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetOrderRequest.ProtoReflect.Descriptor instead.
+func (*GetOrderRequest) Descriptor() ([]byte, []int) {
+	return file_order_api_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *GetOrderRequest) GetId() *UUID {
+	if x != nil {
+		return x.Id
+	}
+	return nil
+}
+
+type GetOrderResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Order         *Order                 `protobuf:"bytes,1,opt,name=order,proto3" json:"order,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetOrderResponse) Reset() {
+	*x = GetOrderResponse{}
+	mi := &file_order_api_proto_msgTypes[3]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetOrderResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetOrderResponse) ProtoMessage() {}
+
+func (x *GetOrderResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_order_api_proto_msgTypes[3]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetOrderResponse.ProtoReflect.Descriptor instead.
+func (*GetOrderResponse) Descriptor() ([]byte, []int) {
+	return file_order_api_proto_rawDescGZIP(), []int{3}
+}
+
+func (x *GetOrderResponse) GetOrder() *Order {
+	if x != nil {
+		return x.Order
+	}
+	return nil
 }
 
 type GetHealthRequest struct {
@@ -78,7 +237,7 @@ type GetHealthRequest struct {
 
 func (x *GetHealthRequest) Reset() {
 	*x = GetHealthRequest{}
-	mi := &file_order_api_proto_msgTypes[0]
+	mi := &file_order_api_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -90,7 +249,7 @@ func (x *GetHealthRequest) String() string {
 func (*GetHealthRequest) ProtoMessage() {}
 
 func (x *GetHealthRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_order_api_proto_msgTypes[0]
+	mi := &file_order_api_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -103,7 +262,7 @@ func (x *GetHealthRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetHealthRequest.ProtoReflect.Descriptor instead.
 func (*GetHealthRequest) Descriptor() ([]byte, []int) {
-	return file_order_api_proto_rawDescGZIP(), []int{0}
+	return file_order_api_proto_rawDescGZIP(), []int{4}
 }
 
 type GetHealthResponse struct {
@@ -115,7 +274,7 @@ type GetHealthResponse struct {
 
 func (x *GetHealthResponse) Reset() {
 	*x = GetHealthResponse{}
-	mi := &file_order_api_proto_msgTypes[1]
+	mi := &file_order_api_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -127,7 +286,7 @@ func (x *GetHealthResponse) String() string {
 func (*GetHealthResponse) ProtoMessage() {}
 
 func (x *GetHealthResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_order_api_proto_msgTypes[1]
+	mi := &file_order_api_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -140,7 +299,7 @@ func (x *GetHealthResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetHealthResponse.ProtoReflect.Descriptor instead.
 func (*GetHealthResponse) Descriptor() ([]byte, []int) {
-	return file_order_api_proto_rawDescGZIP(), []int{1}
+	return file_order_api_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *GetHealthResponse) GetStatus() HealthStatus {
@@ -154,16 +313,27 @@ var File_order_api_proto protoreflect.FileDescriptor
 
 const file_order_api_proto_rawDesc = "" +
 	"\n" +
-	"\x0forder_api.proto\x12\border.v1\"\x12\n" +
+	"\x0forder_api.proto\x12\border.v1\x1a\vtypes.proto\x1a\vorder.proto\"\xc9\x01\n" +
+	"\x12CreateOrderRequest\x123\n" +
+	"\rinstrument_id\x18\x01 \x01(\v2\x0e.order.v1.UUIDR\finstrumentId\x12-\n" +
+	"\n" +
+	"account_id\x18\x02 \x01(\v2\x0e.order.v1.UUIDR\taccountId\x127\n" +
+	"\x0fidempotency_key\x18\x03 \x01(\v2\x0e.order.v1.UUIDR\x0eidempotencyKey\x12\x16\n" +
+	"\x06amount\x18\x04 \x01(\x03R\x06amount\"d\n" +
+	"\x13CreateOrderResponse\x12\x1e\n" +
+	"\x02id\x18\x01 \x01(\v2\x0e.order.v1.UUIDR\x02id\x12-\n" +
+	"\x06status\x18\x02 \x01(\x0e2\x15.order.v1.OrderStatusR\x06status\"1\n" +
+	"\x0fGetOrderRequest\x12\x1e\n" +
+	"\x02id\x18\x01 \x01(\v2\x0e.order.v1.UUIDR\x02id\"9\n" +
+	"\x10GetOrderResponse\x12%\n" +
+	"\x05order\x18\x01 \x01(\v2\x0f.order.v1.OrderR\x05order\"\x12\n" +
 	"\x10GetHealthRequest\"C\n" +
 	"\x11GetHealthResponse\x12.\n" +
-	"\x06status\x18\x01 \x01(\x0e2\x16.order.v1.HealthStatusR\x06status*]\n" +
-	"\fHealthStatus\x12\x1d\n" +
-	"\x19HEALTH_STATUS_UNSPECIFIED\x10\x00\x12\x14\n" +
-	"\x10HEALTH_STATUS_OK\x10\x01\x12\x18\n" +
-	"\x14HEALTH_STATUS_NOT_OK\x10\x022T\n" +
+	"\x06status\x18\x01 \x01(\x0e2\x16.order.v1.HealthStatusR\x06status2\xe3\x01\n" +
 	"\fOrderService\x12D\n" +
-	"\tGetHealth\x12\x1a.order.v1.GetHealthRequest\x1a\x1b.order.v1.GetHealthResponseB7Z5github.com/cathudson/order-service/internal/generatedb\x06proto3"
+	"\tGetHealth\x12\x1a.order.v1.GetHealthRequest\x1a\x1b.order.v1.GetHealthResponse\x12J\n" +
+	"\vCreateOrder\x12\x1c.order.v1.CreateOrderRequest\x1a\x1d.order.v1.CreateOrderResponse\x12A\n" +
+	"\bGetOrder\x12\x19.order.v1.GetOrderRequest\x1a\x1a.order.v1.GetOrderResponseB7Z5github.com/cathudson/order-service/internal/generatedb\x06proto3"
 
 var (
 	file_order_api_proto_rawDescOnce sync.Once
@@ -177,22 +347,39 @@ func file_order_api_proto_rawDescGZIP() []byte {
 	return file_order_api_proto_rawDescData
 }
 
-var file_order_api_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_order_api_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
+var file_order_api_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
 var file_order_api_proto_goTypes = []any{
-	(HealthStatus)(0),         // 0: order.v1.HealthStatus
-	(*GetHealthRequest)(nil),  // 1: order.v1.GetHealthRequest
-	(*GetHealthResponse)(nil), // 2: order.v1.GetHealthResponse
+	(*CreateOrderRequest)(nil),  // 0: order.v1.CreateOrderRequest
+	(*CreateOrderResponse)(nil), // 1: order.v1.CreateOrderResponse
+	(*GetOrderRequest)(nil),     // 2: order.v1.GetOrderRequest
+	(*GetOrderResponse)(nil),    // 3: order.v1.GetOrderResponse
+	(*GetHealthRequest)(nil),    // 4: order.v1.GetHealthRequest
+	(*GetHealthResponse)(nil),   // 5: order.v1.GetHealthResponse
+	(*UUID)(nil),                // 6: order.v1.UUID
+	(OrderStatus)(0),            // 7: order.v1.OrderStatus
+	(*Order)(nil),               // 8: order.v1.Order
+	(HealthStatus)(0),           // 9: order.v1.HealthStatus
 }
 var file_order_api_proto_depIdxs = []int32{
-	0, // 0: order.v1.GetHealthResponse.status:type_name -> order.v1.HealthStatus
-	1, // 1: order.v1.OrderService.GetHealth:input_type -> order.v1.GetHealthRequest
-	2, // 2: order.v1.OrderService.GetHealth:output_type -> order.v1.GetHealthResponse
-	2, // [2:3] is the sub-list for method output_type
-	1, // [1:2] is the sub-list for method input_type
-	1, // [1:1] is the sub-list for extension type_name
-	1, // [1:1] is the sub-list for extension extendee
-	0, // [0:1] is the sub-list for field type_name
+	6,  // 0: order.v1.CreateOrderRequest.instrument_id:type_name -> order.v1.UUID
+	6,  // 1: order.v1.CreateOrderRequest.account_id:type_name -> order.v1.UUID
+	6,  // 2: order.v1.CreateOrderRequest.idempotency_key:type_name -> order.v1.UUID
+	6,  // 3: order.v1.CreateOrderResponse.id:type_name -> order.v1.UUID
+	7,  // 4: order.v1.CreateOrderResponse.status:type_name -> order.v1.OrderStatus
+	6,  // 5: order.v1.GetOrderRequest.id:type_name -> order.v1.UUID
+	8,  // 6: order.v1.GetOrderResponse.order:type_name -> order.v1.Order
+	9,  // 7: order.v1.GetHealthResponse.status:type_name -> order.v1.HealthStatus
+	4,  // 8: order.v1.OrderService.GetHealth:input_type -> order.v1.GetHealthRequest
+	0,  // 9: order.v1.OrderService.CreateOrder:input_type -> order.v1.CreateOrderRequest
+	2,  // 10: order.v1.OrderService.GetOrder:input_type -> order.v1.GetOrderRequest
+	5,  // 11: order.v1.OrderService.GetHealth:output_type -> order.v1.GetHealthResponse
+	1,  // 12: order.v1.OrderService.CreateOrder:output_type -> order.v1.CreateOrderResponse
+	3,  // 13: order.v1.OrderService.GetOrder:output_type -> order.v1.GetOrderResponse
+	11, // [11:14] is the sub-list for method output_type
+	8,  // [8:11] is the sub-list for method input_type
+	8,  // [8:8] is the sub-list for extension type_name
+	8,  // [8:8] is the sub-list for extension extendee
+	0,  // [0:8] is the sub-list for field type_name
 }
 
 func init() { file_order_api_proto_init() }
@@ -200,19 +387,20 @@ func file_order_api_proto_init() {
 	if File_order_api_proto != nil {
 		return
 	}
+	file_types_proto_init()
+	file_order_proto_init()
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_order_api_proto_rawDesc), len(file_order_api_proto_rawDesc)),
-			NumEnums:      1,
-			NumMessages:   2,
+			NumEnums:      0,
+			NumMessages:   6,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
 		GoTypes:           file_order_api_proto_goTypes,
 		DependencyIndexes: file_order_api_proto_depIdxs,
-		EnumInfos:         file_order_api_proto_enumTypes,
 		MessageInfos:      file_order_api_proto_msgTypes,
 	}.Build()
 	File_order_api_proto = out.File
