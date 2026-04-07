@@ -21,61 +21,6 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-type OrderStatus int32
-
-const (
-	OrderStatus_ORDER_STATUS_UNSPECIFIED OrderStatus = 0
-	OrderStatus_ORDER_STATUS_NEW         OrderStatus = 1
-	OrderStatus_ORDER_STATUS_PENDING     OrderStatus = 2
-	OrderStatus_ORDER_STATUS_SUCCESSFUL  OrderStatus = 3
-	OrderStatus_ORDER_STATUS_FAILED      OrderStatus = 4
-)
-
-// Enum value maps for OrderStatus.
-var (
-	OrderStatus_name = map[int32]string{
-		0: "ORDER_STATUS_UNSPECIFIED",
-		1: "ORDER_STATUS_NEW",
-		2: "ORDER_STATUS_PENDING",
-		3: "ORDER_STATUS_SUCCESSFUL",
-		4: "ORDER_STATUS_FAILED",
-	}
-	OrderStatus_value = map[string]int32{
-		"ORDER_STATUS_UNSPECIFIED": 0,
-		"ORDER_STATUS_NEW":         1,
-		"ORDER_STATUS_PENDING":     2,
-		"ORDER_STATUS_SUCCESSFUL":  3,
-		"ORDER_STATUS_FAILED":      4,
-	}
-)
-
-func (x OrderStatus) Enum() *OrderStatus {
-	p := new(OrderStatus)
-	*p = x
-	return p
-}
-
-func (x OrderStatus) String() string {
-	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
-}
-
-func (OrderStatus) Descriptor() protoreflect.EnumDescriptor {
-	return file_types_proto_enumTypes[0].Descriptor()
-}
-
-func (OrderStatus) Type() protoreflect.EnumType {
-	return &file_types_proto_enumTypes[0]
-}
-
-func (x OrderStatus) Number() protoreflect.EnumNumber {
-	return protoreflect.EnumNumber(x)
-}
-
-// Deprecated: Use OrderStatus.Descriptor instead.
-func (OrderStatus) EnumDescriptor() ([]byte, []int) {
-	return file_types_proto_rawDescGZIP(), []int{0}
-}
-
 type HealthStatus int32
 
 const (
@@ -109,11 +54,11 @@ func (x HealthStatus) String() string {
 }
 
 func (HealthStatus) Descriptor() protoreflect.EnumDescriptor {
-	return file_types_proto_enumTypes[1].Descriptor()
+	return file_types_proto_enumTypes[0].Descriptor()
 }
 
 func (HealthStatus) Type() protoreflect.EnumType {
-	return &file_types_proto_enumTypes[1]
+	return &file_types_proto_enumTypes[0]
 }
 
 func (x HealthStatus) Number() protoreflect.EnumNumber {
@@ -122,7 +67,7 @@ func (x HealthStatus) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use HealthStatus.Descriptor instead.
 func (HealthStatus) EnumDescriptor() ([]byte, []int) {
-	return file_types_proto_rawDescGZIP(), []int{1}
+	return file_types_proto_rawDescGZIP(), []int{0}
 }
 
 type UUID struct {
@@ -175,13 +120,7 @@ const file_types_proto_rawDesc = "" +
 	"\n" +
 	"\vtypes.proto\x12\border.v1\"\x1c\n" +
 	"\x04UUID\x12\x14\n" +
-	"\x05value\x18\x01 \x01(\tR\x05value*\x91\x01\n" +
-	"\vOrderStatus\x12\x1c\n" +
-	"\x18ORDER_STATUS_UNSPECIFIED\x10\x00\x12\x14\n" +
-	"\x10ORDER_STATUS_NEW\x10\x01\x12\x18\n" +
-	"\x14ORDER_STATUS_PENDING\x10\x02\x12\x1b\n" +
-	"\x17ORDER_STATUS_SUCCESSFUL\x10\x03\x12\x17\n" +
-	"\x13ORDER_STATUS_FAILED\x10\x04*]\n" +
+	"\x05value\x18\x01 \x01(\tR\x05value*]\n" +
 	"\fHealthStatus\x12\x1d\n" +
 	"\x19HEALTH_STATUS_UNSPECIFIED\x10\x00\x12\x14\n" +
 	"\x10HEALTH_STATUS_OK\x10\x01\x12\x18\n" +
@@ -199,12 +138,11 @@ func file_types_proto_rawDescGZIP() []byte {
 	return file_types_proto_rawDescData
 }
 
-var file_types_proto_enumTypes = make([]protoimpl.EnumInfo, 2)
+var file_types_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
 var file_types_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
 var file_types_proto_goTypes = []any{
-	(OrderStatus)(0),  // 0: order.v1.OrderStatus
-	(HealthStatus)(0), // 1: order.v1.HealthStatus
-	(*UUID)(nil),      // 2: order.v1.UUID
+	(HealthStatus)(0), // 0: order.v1.HealthStatus
+	(*UUID)(nil),      // 1: order.v1.UUID
 }
 var file_types_proto_depIdxs = []int32{
 	0, // [0:0] is the sub-list for method output_type
@@ -224,7 +162,7 @@ func file_types_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_types_proto_rawDesc), len(file_types_proto_rawDesc)),
-			NumEnums:      2,
+			NumEnums:      1,
 			NumMessages:   1,
 			NumExtensions: 0,
 			NumServices:   0,

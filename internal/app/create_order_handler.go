@@ -2,13 +2,14 @@ package app
 
 import (
 	"context"
-	"fmt"
 	"time"
 
 	"github.com/cathudson/order-service/internal/generated"
 	"github.com/cathudson/order-service/internal/mappers"
 	"github.com/cathudson/order-service/internal/store"
 	"github.com/google/uuid"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 type createOrderHandler struct {
@@ -26,10 +27,9 @@ func (h *createOrderHandler) handle(ctx context.Context, request *generated.Crea
 		return nil, err
 	}
 
-	entity := mappers.OrderFromCreateOrderRequest(request, h.now())
-	entity, err = h.orderStore.Create(ctx, entity)
+	entity, err := h.orderStore.Create(ctx, mappers.OrderFromCreateOrderRequest(request, h.now()))
 	if err != nil {
-		return nil, err
+		return nil, status.Errorf(codes.Internal, "error in store: %v", err)
 	}
 
 	return &generated.CreateOrderResponse{
@@ -39,17 +39,20 @@ func (h *createOrderHandler) handle(ctx context.Context, request *generated.Crea
 }
 
 func (h *createOrderHandler) validate(request *generated.CreateOrderRequest) error {
-	if request.GetAmount() == 0 {
-		return fmt.Errorf("amount must not be zero")
+	if request.GetAmount() <= 0 {
+		return status.Errorf(codes.InvalidArgument, "invalid amount: %v", request.GetAmount())
+	}
+	if request.GetSide() == generated.OrderSide_OrderSide_UNSPECIFIED {
+		return status.Errorf(codes.InvalidArgument, "invalid side: %v", request.GetSide())
 	}
 	if _, err := uuid.Parse(request.GetAccountId().GetValue()); err != nil {
-		return fmt.Errorf("invalid account id: %w", err)
+		return status.Errorf(codes.InvalidArgument, "invalid account id: %v", err)
 	}
 	if _, err := uuid.Parse(request.GetIdempotencyKey().GetValue()); err != nil {
-		return fmt.Errorf("invalid idempotency key: %w", err)
+		return status.Errorf(codes.InvalidArgument, "invalid idempotency key: %v", err)
 	}
 	if _, err := uuid.Parse(request.GetInstrumentId().GetValue()); err != nil {
-		return fmt.Errorf("invalid instrument id: %w", err)
+		return status.Errorf(codes.InvalidArgument, "invalid instrument id: %v", err)
 	}
 	return nil
 }

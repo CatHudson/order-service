@@ -8,23 +8,13 @@ import (
 	"github.com/google/uuid"
 )
 
-func OrderFromProto(proto *generated.Order) *domain.Order {
-	return &domain.Order{
-		ID:             uuidFromProto(proto.GetId()),
-		AccountID:      uuidFromProto(proto.GetAccountId()),
-		IdempotencyKey: uuidFromProto(proto.GetIdempotencyKey()),
-		InstrumentID:   uuidFromProto(proto.GetInstrumentId()),
-		Amount:         proto.GetAmount(),
-		Status:         orderStatusFromProto(proto.GetStatus()),
-	}
-}
-
 func OrderFromCreateOrderRequest(request *generated.CreateOrderRequest, time time.Time) *domain.Order {
 	entity := &domain.Order{
 		ID:             uuid.New(),
 		AccountID:      uuid.MustParse(request.GetAccountId().GetValue()),
 		IdempotencyKey: uuid.MustParse(request.GetIdempotencyKey().GetValue()),
 		InstrumentID:   uuid.MustParse(request.GetInstrumentId().GetValue()),
+		Side:           orderSideFromProto(request.GetSide()),
 		Amount:         request.GetAmount(),
 		Status:         domain.OrderStatusNew,
 		UpdatedAt:      time,
@@ -33,13 +23,7 @@ func OrderFromCreateOrderRequest(request *generated.CreateOrderRequest, time tim
 	return entity
 }
 
-func uuidFromProto(proto *generated.UUID) uuid.UUID {
-	if proto == nil {
-		return uuid.Nil
-	}
-	return uuid.MustParse(proto.GetValue())
-}
-
+// nolint: unused // will be used later
 func orderStatusFromProto(status generated.OrderStatus) domain.OrderStatus {
 	switch status {
 	case generated.OrderStatus_ORDER_STATUS_NEW:
@@ -53,7 +37,20 @@ func orderStatusFromProto(status generated.OrderStatus) domain.OrderStatus {
 	case generated.OrderStatus_ORDER_STATUS_UNSPECIFIED:
 		return domain.OrderStatusNew
 	default:
-		return domain.OrderStatusNew
+		return ""
+	}
+}
+
+func orderSideFromProto(side generated.OrderSide) domain.OrderSide {
+	switch side {
+	case generated.OrderSide_OrderSide_BUY:
+		return domain.OrderSideBuy
+	case generated.OrderSide_OrderSide_SELL:
+		return domain.OrderSideSell
+	case generated.OrderSide_OrderSide_UNSPECIFIED:
+		return ""
+	default:
+		return ""
 	}
 }
 
@@ -68,10 +65,8 @@ func OrderToProto(entity *domain.Order) *generated.Order {
 	}
 }
 
-func uuidToProto(uuid uuid.UUID) *generated.UUID {
-	return &generated.UUID{
-		Value: uuid.String(),
-	}
+func uuidToProto(id uuid.UUID) *generated.UUID {
+	return &generated.UUID{Value: id.String()}
 }
 
 func OrderStatusToProto(status domain.OrderStatus) generated.OrderStatus {

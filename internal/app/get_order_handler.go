@@ -2,12 +2,15 @@ package app
 
 import (
 	"context"
-	"fmt"
+	"errors"
 
+	"github.com/cathudson/order-service/internal/domain"
 	"github.com/cathudson/order-service/internal/generated"
 	"github.com/cathudson/order-service/internal/mappers"
 	"github.com/cathudson/order-service/internal/store"
 	"github.com/google/uuid"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 type getOrderHandler struct {
@@ -26,7 +29,10 @@ func (h *getOrderHandler) handle(ctx context.Context, request *generated.GetOrde
 
 	entity, err := h.orderStore.GetByID(ctx, uuid.MustParse(request.GetId().GetValue()))
 	if err != nil {
-		return nil, err
+		if errors.Is(err, domain.ErrOrderNotFound) {
+			return nil, status.Errorf(codes.NotFound, "order not found: %v", err)
+		}
+		return nil, status.Errorf(codes.Internal, "store error: %v", err)
 	}
 
 	return &generated.GetOrderResponse{Order: mappers.OrderToProto(entity)}, nil
@@ -35,7 +41,7 @@ func (h *getOrderHandler) handle(ctx context.Context, request *generated.GetOrde
 func (h *getOrderHandler) validate(request *generated.GetOrderRequest) error {
 	_, err := uuid.Parse(request.GetId().GetValue())
 	if err != nil {
-		return fmt.Errorf("invalid id: %w", err)
+		return status.Errorf(codes.InvalidArgument, "invalid id: %v", err)
 	}
 	return nil
 }

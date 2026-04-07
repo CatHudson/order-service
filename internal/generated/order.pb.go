@@ -21,14 +21,119 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+type OrderStatus int32
+
+const (
+	OrderStatus_ORDER_STATUS_UNSPECIFIED OrderStatus = 0
+	OrderStatus_ORDER_STATUS_NEW         OrderStatus = 1
+	OrderStatus_ORDER_STATUS_PENDING     OrderStatus = 2
+	OrderStatus_ORDER_STATUS_SUCCESSFUL  OrderStatus = 3
+	OrderStatus_ORDER_STATUS_FAILED      OrderStatus = 4
+)
+
+// Enum value maps for OrderStatus.
+var (
+	OrderStatus_name = map[int32]string{
+		0: "ORDER_STATUS_UNSPECIFIED",
+		1: "ORDER_STATUS_NEW",
+		2: "ORDER_STATUS_PENDING",
+		3: "ORDER_STATUS_SUCCESSFUL",
+		4: "ORDER_STATUS_FAILED",
+	}
+	OrderStatus_value = map[string]int32{
+		"ORDER_STATUS_UNSPECIFIED": 0,
+		"ORDER_STATUS_NEW":         1,
+		"ORDER_STATUS_PENDING":     2,
+		"ORDER_STATUS_SUCCESSFUL":  3,
+		"ORDER_STATUS_FAILED":      4,
+	}
+)
+
+func (x OrderStatus) Enum() *OrderStatus {
+	p := new(OrderStatus)
+	*p = x
+	return p
+}
+
+func (x OrderStatus) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (OrderStatus) Descriptor() protoreflect.EnumDescriptor {
+	return file_order_proto_enumTypes[0].Descriptor()
+}
+
+func (OrderStatus) Type() protoreflect.EnumType {
+	return &file_order_proto_enumTypes[0]
+}
+
+func (x OrderStatus) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use OrderStatus.Descriptor instead.
+func (OrderStatus) EnumDescriptor() ([]byte, []int) {
+	return file_order_proto_rawDescGZIP(), []int{0}
+}
+
+type OrderSide int32
+
+const (
+	OrderSide_OrderSide_UNSPECIFIED OrderSide = 0
+	OrderSide_OrderSide_BUY         OrderSide = 1
+	OrderSide_OrderSide_SELL        OrderSide = 2
+)
+
+// Enum value maps for OrderSide.
+var (
+	OrderSide_name = map[int32]string{
+		0: "OrderSide_UNSPECIFIED",
+		1: "OrderSide_BUY",
+		2: "OrderSide_SELL",
+	}
+	OrderSide_value = map[string]int32{
+		"OrderSide_UNSPECIFIED": 0,
+		"OrderSide_BUY":         1,
+		"OrderSide_SELL":        2,
+	}
+)
+
+func (x OrderSide) Enum() *OrderSide {
+	p := new(OrderSide)
+	*p = x
+	return p
+}
+
+func (x OrderSide) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (OrderSide) Descriptor() protoreflect.EnumDescriptor {
+	return file_order_proto_enumTypes[1].Descriptor()
+}
+
+func (OrderSide) Type() protoreflect.EnumType {
+	return &file_order_proto_enumTypes[1]
+}
+
+func (x OrderSide) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use OrderSide.Descriptor instead.
+func (OrderSide) EnumDescriptor() ([]byte, []int) {
+	return file_order_proto_rawDescGZIP(), []int{1}
+}
+
 type Order struct {
 	state          protoimpl.MessageState `protogen:"open.v1"`
 	Id             *UUID                  `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	AccountId      *UUID                  `protobuf:"bytes,2,opt,name=account_id,json=accountId,proto3" json:"account_id,omitempty"`
 	IdempotencyKey *UUID                  `protobuf:"bytes,3,opt,name=idempotency_key,json=idempotencyKey,proto3" json:"idempotency_key,omitempty"`
 	InstrumentId   *UUID                  `protobuf:"bytes,4,opt,name=instrument_id,json=instrumentId,proto3" json:"instrument_id,omitempty"`
-	Amount         int64                  `protobuf:"varint,5,opt,name=amount,proto3" json:"amount,omitempty"`
-	Status         OrderStatus            `protobuf:"varint,6,opt,name=status,proto3,enum=order.v1.OrderStatus" json:"status,omitempty"`
+	Amount         uint64                 `protobuf:"varint,5,opt,name=amount,proto3" json:"amount,omitempty"`
+	Side           OrderSide              `protobuf:"varint,6,opt,name=side,proto3,enum=order.v1.OrderSide" json:"side,omitempty"`
+	Status         OrderStatus            `protobuf:"varint,7,opt,name=status,proto3,enum=order.v1.OrderStatus" json:"status,omitempty"`
 	unknownFields  protoimpl.UnknownFields
 	sizeCache      protoimpl.SizeCache
 }
@@ -91,11 +196,18 @@ func (x *Order) GetInstrumentId() *UUID {
 	return nil
 }
 
-func (x *Order) GetAmount() int64 {
+func (x *Order) GetAmount() uint64 {
 	if x != nil {
 		return x.Amount
 	}
 	return 0
+}
+
+func (x *Order) GetSide() OrderSide {
+	if x != nil {
+		return x.Side
+	}
+	return OrderSide_OrderSide_UNSPECIFIED
 }
 
 func (x *Order) GetStatus() OrderStatus {
@@ -109,15 +221,26 @@ var File_order_proto protoreflect.FileDescriptor
 
 const file_order_proto_rawDesc = "" +
 	"\n" +
-	"\vorder.proto\x12\border.v1\x1a\vtypes.proto\"\x8b\x02\n" +
+	"\vorder.proto\x12\border.v1\x1a\vtypes.proto\"\xb4\x02\n" +
 	"\x05Order\x12\x1e\n" +
 	"\x02id\x18\x01 \x01(\v2\x0e.order.v1.UUIDR\x02id\x12-\n" +
 	"\n" +
 	"account_id\x18\x02 \x01(\v2\x0e.order.v1.UUIDR\taccountId\x127\n" +
 	"\x0fidempotency_key\x18\x03 \x01(\v2\x0e.order.v1.UUIDR\x0eidempotencyKey\x123\n" +
 	"\rinstrument_id\x18\x04 \x01(\v2\x0e.order.v1.UUIDR\finstrumentId\x12\x16\n" +
-	"\x06amount\x18\x05 \x01(\x03R\x06amount\x12-\n" +
-	"\x06status\x18\x06 \x01(\x0e2\x15.order.v1.OrderStatusR\x06statusB7Z5github.com/cathudson/order-service/internal/generatedb\x06proto3"
+	"\x06amount\x18\x05 \x01(\x04R\x06amount\x12'\n" +
+	"\x04side\x18\x06 \x01(\x0e2\x13.order.v1.OrderSideR\x04side\x12-\n" +
+	"\x06status\x18\a \x01(\x0e2\x15.order.v1.OrderStatusR\x06status*\x91\x01\n" +
+	"\vOrderStatus\x12\x1c\n" +
+	"\x18ORDER_STATUS_UNSPECIFIED\x10\x00\x12\x14\n" +
+	"\x10ORDER_STATUS_NEW\x10\x01\x12\x18\n" +
+	"\x14ORDER_STATUS_PENDING\x10\x02\x12\x1b\n" +
+	"\x17ORDER_STATUS_SUCCESSFUL\x10\x03\x12\x17\n" +
+	"\x13ORDER_STATUS_FAILED\x10\x04*M\n" +
+	"\tOrderSide\x12\x19\n" +
+	"\x15OrderSide_UNSPECIFIED\x10\x00\x12\x11\n" +
+	"\rOrderSide_BUY\x10\x01\x12\x12\n" +
+	"\x0eOrderSide_SELL\x10\x02B7Z5github.com/cathudson/order-service/internal/generatedb\x06proto3"
 
 var (
 	file_order_proto_rawDescOnce sync.Once
@@ -131,23 +254,26 @@ func file_order_proto_rawDescGZIP() []byte {
 	return file_order_proto_rawDescData
 }
 
+var file_order_proto_enumTypes = make([]protoimpl.EnumInfo, 2)
 var file_order_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
 var file_order_proto_goTypes = []any{
-	(*Order)(nil),    // 0: order.v1.Order
-	(*UUID)(nil),     // 1: order.v1.UUID
-	(OrderStatus)(0), // 2: order.v1.OrderStatus
+	(OrderStatus)(0), // 0: order.v1.OrderStatus
+	(OrderSide)(0),   // 1: order.v1.OrderSide
+	(*Order)(nil),    // 2: order.v1.Order
+	(*UUID)(nil),     // 3: order.v1.UUID
 }
 var file_order_proto_depIdxs = []int32{
-	1, // 0: order.v1.Order.id:type_name -> order.v1.UUID
-	1, // 1: order.v1.Order.account_id:type_name -> order.v1.UUID
-	1, // 2: order.v1.Order.idempotency_key:type_name -> order.v1.UUID
-	1, // 3: order.v1.Order.instrument_id:type_name -> order.v1.UUID
-	2, // 4: order.v1.Order.status:type_name -> order.v1.OrderStatus
-	5, // [5:5] is the sub-list for method output_type
-	5, // [5:5] is the sub-list for method input_type
-	5, // [5:5] is the sub-list for extension type_name
-	5, // [5:5] is the sub-list for extension extendee
-	0, // [0:5] is the sub-list for field type_name
+	3, // 0: order.v1.Order.id:type_name -> order.v1.UUID
+	3, // 1: order.v1.Order.account_id:type_name -> order.v1.UUID
+	3, // 2: order.v1.Order.idempotency_key:type_name -> order.v1.UUID
+	3, // 3: order.v1.Order.instrument_id:type_name -> order.v1.UUID
+	1, // 4: order.v1.Order.side:type_name -> order.v1.OrderSide
+	0, // 5: order.v1.Order.status:type_name -> order.v1.OrderStatus
+	6, // [6:6] is the sub-list for method output_type
+	6, // [6:6] is the sub-list for method input_type
+	6, // [6:6] is the sub-list for extension type_name
+	6, // [6:6] is the sub-list for extension extendee
+	0, // [0:6] is the sub-list for field type_name
 }
 
 func init() { file_order_proto_init() }
@@ -161,13 +287,14 @@ func file_order_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_order_proto_rawDesc), len(file_order_proto_rawDesc)),
-			NumEnums:      0,
+			NumEnums:      2,
 			NumMessages:   1,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
 		GoTypes:           file_order_proto_goTypes,
 		DependencyIndexes: file_order_proto_depIdxs,
+		EnumInfos:         file_order_proto_enumTypes,
 		MessageInfos:      file_order_proto_msgTypes,
 	}.Build()
 	File_order_proto = out.File

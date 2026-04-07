@@ -11,7 +11,8 @@ type Order struct {
 	AccountID      uuid.UUID
 	IdempotencyKey uuid.UUID
 	InstrumentID   uuid.UUID
-	Amount         int64
+	Side           OrderSide
+	Amount         uint64
 	Status         OrderStatus
 	UpdatedAt      time.Time
 	CreatedAt      time.Time
@@ -24,4 +25,11 @@ const (
 	OrderStatusPending OrderStatus = "PENDING"
 	OrderStatusSuccess OrderStatus = "SUCCESS"
 	OrderStatusFailed  OrderStatus = "FAILED"
+)
+
+type OrderSide string
+
+const (
+	OrderSideBuy  OrderSide = "BUY"
+	OrderSideSell OrderSide = "SELL"
 )
