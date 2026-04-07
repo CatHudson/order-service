@@ -13,6 +13,7 @@ import (
 type OrderStore interface {
 	Create(ctx context.Context, order *domain.Order) (*domain.Order, error)
 	GetByID(ctx context.Context, id uuid.UUID) (*domain.Order, error)
+	GetAllByStatus(ctx context.Context, status domain.OrderStatus) ([]*domain.Order, error)
 }
 
 type orderStore struct {
@@ -30,5 +31,10 @@ func (s *orderStore) Create(ctx context.Context, order *domain.Order) (*domain.O
 
 // nolint: revive // Will implement later
 func (s *orderStore) GetByID(ctx context.Context, id uuid.UUID) (*domain.Order, error) {
+	return nil, errors.New("not implemented")
+}
+
+// nolint: revive // Will implement later
+func (s *orderStore) GetAllByStatus(ctx context.Context, status domain.OrderStatus) ([]*domain.Order, error) {
 	return nil, errors.New("not implemented")
 }
