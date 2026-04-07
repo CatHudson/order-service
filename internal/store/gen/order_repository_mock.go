@@ -24,6 +24,9 @@ var _ store.OrderStore = &OrderStoreMock{}
 //			CreateFunc: func(ctx context.Context, order *domain.Order) (*domain.Order, error) {
 //				panic("mock out the Create method")
 //			},
+//			GetAllByStatusFunc: func(ctx context.Context, status domain.OrderStatus) ([]*domain.Order, error) {
+//				panic("mock out the GetAllByStatus method")
+//			},
 //			GetByIDFunc: func(ctx context.Context, id uuid.UUID) (*domain.Order, error) {
 //				panic("mock out the GetByID method")
 //			},
@@ -37,6 +40,9 @@ type OrderStoreMock struct {
 	// CreateFunc mocks the Create method.
 	CreateFunc func(ctx context.Context, order *domain.Order) (*domain.Order, error)
 
+	// GetAllByStatusFunc mocks the GetAllByStatus method.
+	GetAllByStatusFunc func(ctx context.Context, status domain.OrderStatus) ([]*domain.Order, error)
+
 	// GetByIDFunc mocks the GetByID method.
 	GetByIDFunc func(ctx context.Context, id uuid.UUID) (*domain.Order, error)
 
@@ -49,6 +55,13 @@ type OrderStoreMock struct {
 			// Order is the order argument value.
 			Order *domain.Order
 		}
+		// GetAllByStatus holds details about calls to the GetAllByStatus method.
+		GetAllByStatus []struct {
+			// Ctx is the ctx argument value.
+			Ctx context.Context
+			// Status is the status argument value.
+			Status domain.OrderStatus
+		}
 		// GetByID holds details about calls to the GetByID method.
 		GetByID []struct {
 			// Ctx is the ctx argument value.
@@ -57,8 +70,9 @@ type OrderStoreMock struct {
 			ID uuid.UUID
 		}
 	}
-	lockCreate  sync.RWMutex
-	lockGetByID sync.RWMutex
+	lockCreate         sync.RWMutex
+	lockGetAllByStatus sync.RWMutex
+	lockGetByID        sync.RWMutex
 }
 
 // Create calls CreateFunc.
@@ -94,6 +108,42 @@ func (mock *OrderStoreMock) CreateCalls() []struct {
 	mock.lockCreate.RLock()
 	calls = mock.calls.Create
 	mock.lockCreate.RUnlock()
+	return calls
+}
+
+// GetAllByStatus calls GetAllByStatusFunc.
+func (mock *OrderStoreMock) GetAllByStatus(ctx context.Context, status domain.OrderStatus) ([]*domain.Order, error) {
+	if mock.GetAllByStatusFunc == nil {
+		panic("OrderStoreMock.GetAllByStatusFunc: method is nil but OrderStore.GetAllByStatus was just called")
+	}
+	callInfo := struct {
+		Ctx    context.Context
+		Status domain.OrderStatus
+	}{
+		Ctx:    ctx,
+		Status: status,
+	}
+	mock.lockGetAllByStatus.Lock()
+	mock.calls.GetAllByStatus = append(mock.calls.GetAllByStatus, callInfo)
+	mock.lockGetAllByStatus.Unlock()
+	return mock.GetAllByStatusFunc(ctx, status)
+}
+
+// GetAllByStatusCalls gets all the calls that were made to GetAllByStatus.
+// Check the length with:
+//
+//	len(mockedOrderStore.GetAllByStatusCalls())
+func (mock *OrderStoreMock) GetAllByStatusCalls() []struct {
+	Ctx    context.Context
+	Status domain.OrderStatus
+} {
+	var calls []struct {
+		Ctx    context.Context
+		Status domain.OrderStatus
+	}
+	mock.lockGetAllByStatus.RLock()
+	calls = mock.calls.GetAllByStatus
+	mock.lockGetAllByStatus.RUnlock()
 	return calls
 }
 
