@@ -26,7 +26,8 @@ type CreateOrderRequest struct {
 	InstrumentId   *UUID                  `protobuf:"bytes,1,opt,name=instrument_id,json=instrumentId,proto3" json:"instrument_id,omitempty"`
 	AccountId      *UUID                  `protobuf:"bytes,2,opt,name=account_id,json=accountId,proto3" json:"account_id,omitempty"`
 	IdempotencyKey *UUID                  `protobuf:"bytes,3,opt,name=idempotency_key,json=idempotencyKey,proto3" json:"idempotency_key,omitempty"`
-	Amount         int64                  `protobuf:"varint,4,opt,name=amount,proto3" json:"amount,omitempty"`
+	Side           OrderSide              `protobuf:"varint,4,opt,name=side,proto3,enum=order.v1.OrderSide" json:"side,omitempty"`
+	Amount         uint64                 `protobuf:"varint,5,opt,name=amount,proto3" json:"amount,omitempty"`
 	unknownFields  protoimpl.UnknownFields
 	sizeCache      protoimpl.SizeCache
 }
@@ -82,7 +83,14 @@ func (x *CreateOrderRequest) GetIdempotencyKey() *UUID {
 	return nil
 }
 
-func (x *CreateOrderRequest) GetAmount() int64 {
+func (x *CreateOrderRequest) GetSide() OrderSide {
+	if x != nil {
+		return x.Side
+	}
+	return OrderSide_OrderSide_UNSPECIFIED
+}
+
+func (x *CreateOrderRequest) GetAmount() uint64 {
 	if x != nil {
 		return x.Amount
 	}
@@ -313,13 +321,14 @@ var File_order_api_proto protoreflect.FileDescriptor
 
 const file_order_api_proto_rawDesc = "" +
 	"\n" +
-	"\x0forder_api.proto\x12\border.v1\x1a\vtypes.proto\x1a\vorder.proto\"\xc9\x01\n" +
+	"\x0forder_api.proto\x12\border.v1\x1a\vtypes.proto\x1a\vorder.proto\"\xf2\x01\n" +
 	"\x12CreateOrderRequest\x123\n" +
 	"\rinstrument_id\x18\x01 \x01(\v2\x0e.order.v1.UUIDR\finstrumentId\x12-\n" +
 	"\n" +
 	"account_id\x18\x02 \x01(\v2\x0e.order.v1.UUIDR\taccountId\x127\n" +
-	"\x0fidempotency_key\x18\x03 \x01(\v2\x0e.order.v1.UUIDR\x0eidempotencyKey\x12\x16\n" +
-	"\x06amount\x18\x04 \x01(\x03R\x06amount\"d\n" +
+	"\x0fidempotency_key\x18\x03 \x01(\v2\x0e.order.v1.UUIDR\x0eidempotencyKey\x12'\n" +
+	"\x04side\x18\x04 \x01(\x0e2\x13.order.v1.OrderSideR\x04side\x12\x16\n" +
+	"\x06amount\x18\x05 \x01(\x04R\x06amount\"d\n" +
 	"\x13CreateOrderResponse\x12\x1e\n" +
 	"\x02id\x18\x01 \x01(\v2\x0e.order.v1.UUIDR\x02id\x12-\n" +
 	"\x06status\x18\x02 \x01(\x0e2\x15.order.v1.OrderStatusR\x06status\"1\n" +
@@ -356,30 +365,32 @@ var file_order_api_proto_goTypes = []any{
 	(*GetHealthRequest)(nil),    // 4: order.v1.GetHealthRequest
 	(*GetHealthResponse)(nil),   // 5: order.v1.GetHealthResponse
 	(*UUID)(nil),                // 6: order.v1.UUID
-	(OrderStatus)(0),            // 7: order.v1.OrderStatus
-	(*Order)(nil),               // 8: order.v1.Order
-	(HealthStatus)(0),           // 9: order.v1.HealthStatus
+	(OrderSide)(0),              // 7: order.v1.OrderSide
+	(OrderStatus)(0),            // 8: order.v1.OrderStatus
+	(*Order)(nil),               // 9: order.v1.Order
+	(HealthStatus)(0),           // 10: order.v1.HealthStatus
 }
 var file_order_api_proto_depIdxs = []int32{
 	6,  // 0: order.v1.CreateOrderRequest.instrument_id:type_name -> order.v1.UUID
 	6,  // 1: order.v1.CreateOrderRequest.account_id:type_name -> order.v1.UUID
 	6,  // 2: order.v1.CreateOrderRequest.idempotency_key:type_name -> order.v1.UUID
-	6,  // 3: order.v1.CreateOrderResponse.id:type_name -> order.v1.UUID
-	7,  // 4: order.v1.CreateOrderResponse.status:type_name -> order.v1.OrderStatus
-	6,  // 5: order.v1.GetOrderRequest.id:type_name -> order.v1.UUID
-	8,  // 6: order.v1.GetOrderResponse.order:type_name -> order.v1.Order
-	9,  // 7: order.v1.GetHealthResponse.status:type_name -> order.v1.HealthStatus
-	4,  // 8: order.v1.OrderService.GetHealth:input_type -> order.v1.GetHealthRequest
-	0,  // 9: order.v1.OrderService.CreateOrder:input_type -> order.v1.CreateOrderRequest
-	2,  // 10: order.v1.OrderService.GetOrder:input_type -> order.v1.GetOrderRequest
-	5,  // 11: order.v1.OrderService.GetHealth:output_type -> order.v1.GetHealthResponse
-	1,  // 12: order.v1.OrderService.CreateOrder:output_type -> order.v1.CreateOrderResponse
-	3,  // 13: order.v1.OrderService.GetOrder:output_type -> order.v1.GetOrderResponse
-	11, // [11:14] is the sub-list for method output_type
-	8,  // [8:11] is the sub-list for method input_type
-	8,  // [8:8] is the sub-list for extension type_name
-	8,  // [8:8] is the sub-list for extension extendee
-	0,  // [0:8] is the sub-list for field type_name
+	7,  // 3: order.v1.CreateOrderRequest.side:type_name -> order.v1.OrderSide
+	6,  // 4: order.v1.CreateOrderResponse.id:type_name -> order.v1.UUID
+	8,  // 5: order.v1.CreateOrderResponse.status:type_name -> order.v1.OrderStatus
+	6,  // 6: order.v1.GetOrderRequest.id:type_name -> order.v1.UUID
+	9,  // 7: order.v1.GetOrderResponse.order:type_name -> order.v1.Order
+	10, // 8: order.v1.GetHealthResponse.status:type_name -> order.v1.HealthStatus
+	4,  // 9: order.v1.OrderService.GetHealth:input_type -> order.v1.GetHealthRequest
+	0,  // 10: order.v1.OrderService.CreateOrder:input_type -> order.v1.CreateOrderRequest
+	2,  // 11: order.v1.OrderService.GetOrder:input_type -> order.v1.GetOrderRequest
+	5,  // 12: order.v1.OrderService.GetHealth:output_type -> order.v1.GetHealthResponse
+	1,  // 13: order.v1.OrderService.CreateOrder:output_type -> order.v1.CreateOrderResponse
+	3,  // 14: order.v1.OrderService.GetOrder:output_type -> order.v1.GetOrderResponse
+	12, // [12:15] is the sub-list for method output_type
+	9,  // [9:12] is the sub-list for method input_type
+	9,  // [9:9] is the sub-list for extension type_name
+	9,  // [9:9] is the sub-list for extension extendee
+	0,  // [0:9] is the sub-list for field type_name
 }
 
 func init() { file_order_api_proto_init() }

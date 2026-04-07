@@ -2,6 +2,7 @@ package store
 
 import (
 	"context"
+	"errors"
 
 	"github.com/cathudson/order-service/internal/domain"
 	"github.com/google/uuid"
@@ -22,12 +23,12 @@ func NewOrderStore() OrderStore {
 	return &orderStore{}
 }
 
-// nolint: nilnil, revive // Will implement later
+// nolint: revive // Will implement later
 func (s *orderStore) Create(ctx context.Context, order *domain.Order) (*domain.Order, error) {
-	panic("not implemented")
+	return nil, errors.New("not implemented")
 }
 
-// nolint: nilnil, revive // Will implement later
+// nolint: revive // Will implement later
 func (s *orderStore) GetByID(ctx context.Context, id uuid.UUID) (*domain.Order, error) {
-	panic("not implemented")
+	return nil, errors.New("not implemented")
 }

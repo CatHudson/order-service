@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"log"
 	"net"
 
 	grpcApp "github.com/cathudson/order-service/internal/app"
@@ -16,7 +17,7 @@ func main() {
 	lc := net.ListenConfig{}
 	listener, err := lc.Listen(ctx, "tcp", ":8081")
 	if err != nil {
-		panic(err)
+		log.Fatalf("failed to listen: %v", err)
 	}
 	defer listener.Close()
 
@@ -27,6 +28,7 @@ func main() {
 	reflection.Register(server)
 	err = server.Serve(listener)
 	if err != nil {
-		panic(err)
+		log.Printf("failed to serve: %v", err)
+		return
 	}
 }

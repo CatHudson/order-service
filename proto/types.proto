@@ -8,14 +8,6 @@ message UUID {
   string value = 1;
 }
 
-enum OrderStatus {
-  ORDER_STATUS_UNSPECIFIED = 0;
-  ORDER_STATUS_NEW = 1;
-  ORDER_STATUS_PENDING = 2;
-  ORDER_STATUS_SUCCESSFUL = 3;
-  ORDER_STATUS_FAILED = 4;
-}
-
 enum HealthStatus {
   HEALTH_STATUS_UNSPECIFIED = 0;
   HEALTH_STATUS_OK = 1;

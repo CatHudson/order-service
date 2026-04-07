@@ -17,7 +17,8 @@ message CreateOrderRequest {
   UUID instrument_id = 1;
   UUID account_id = 2;
   UUID idempotency_key = 3;
-  int64 amount = 4;
+  OrderSide side = 4;
+  uint64 amount = 5;
 }
 
 message CreateOrderResponse {
