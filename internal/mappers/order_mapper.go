@@ -43,11 +43,11 @@ func orderStatusFromProto(status generated.OrderStatus) domain.OrderStatus {
 
 func orderSideFromProto(side generated.OrderSide) domain.OrderSide {
 	switch side {
-	case generated.OrderSide_OrderSide_BUY:
+	case generated.OrderSide_ORDER_SIDE_BUY:
 		return domain.OrderSideBuy
-	case generated.OrderSide_OrderSide_SELL:
+	case generated.OrderSide_ORDER_SIDE_SELL:
 		return domain.OrderSideSell
-	case generated.OrderSide_OrderSide_UNSPECIFIED:
+	case generated.OrderSide_ORDER_SIDE_UNSPECIFIED:
 		return ""
 	default:
 		return ""

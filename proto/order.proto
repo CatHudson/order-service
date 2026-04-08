@@ -25,7 +25,7 @@ enum OrderStatus {
 }
 
 enum OrderSide {
-  OrderSide_UNSPECIFIED = 0;
-  OrderSide_BUY= 1;
-  OrderSide_SELL = 2;
+  ORDER_SIDE_UNSPECIFIED = 0;
+  ORDER_SIDE_BUY= 1;
+  ORDER_SIDE_SELL = 2;
 }

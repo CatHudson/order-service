@@ -17,7 +17,10 @@ import (
 )
 
 func main() {
-	l, _ := zap.NewDevelopment()
+	l, err := zap.NewDevelopment()
+	if err != nil {
+		panic(err)
+	}
 	log := l.Sugar()
 	defer func() { _ = l.Sync() }()
 
@@ -37,7 +40,7 @@ func main() {
 
 	orderStore := store.NewOrderStore()
 
-	go report.NewReporter(ctx, orderStore, log).Run()
+	go report.NewReporter(orderStore, log).Run(ctx)
 
 	app := grpcApp.New(orderStore)
 	server := grpc.NewServer(
@@ -45,6 +48,10 @@ func main() {
 	)
 	generated.RegisterOrderServiceServer(server, app)
 	reflection.Register(server)
+	go func() {
+		<-ctx.Done()
+		server.GracefulStop()
+	}()
 	err = server.Serve(listener)
 	if err != nil {
 		log.Infof("failed to serve: %v", err)
