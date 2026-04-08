@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/shopspring/decimal"
 )
 
 type Order struct {
@@ -12,7 +13,9 @@ type Order struct {
 	IdempotencyKey uuid.UUID
 	InstrumentID   uuid.UUID
 	Side           OrderSide
-	Amount         uint64
+	Amount         *decimal.Decimal
+	Quantity       *decimal.Decimal
+	Price          *decimal.Decimal
 	Status         OrderStatus
 	UpdatedAt      time.Time
 	CreatedAt      time.Time

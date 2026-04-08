@@ -5,6 +5,7 @@ import (
 
 	"github.com/cathudson/order-service/internal/domain"
 	"github.com/cathudson/order-service/internal/generated"
+	"github.com/cathudson/order-service/internal/utils"
 	"github.com/google/uuid"
 )
 
@@ -15,11 +16,21 @@ func OrderFromCreateOrderRequest(request *generated.CreateOrderRequest, time tim
 		IdempotencyKey: uuid.MustParse(request.GetIdempotencyKey().GetValue()),
 		InstrumentID:   uuid.MustParse(request.GetInstrumentId().GetValue()),
 		Side:           orderSideFromProto(request.GetSide()),
-		Amount:         request.GetAmount(),
+		Amount:         nil,
+		Price:          nil,
+		Quantity:       nil,
 		Status:         domain.OrderStatusNew,
 		UpdatedAt:      time,
 		CreatedAt:      time,
 	}
+
+	switch request.GetAmount().(type) {
+	case *generated.CreateOrderRequest_Quantity:
+		entity.Quantity = new(utils.DecimalFromProto(request.GetQuantity()))
+	case *generated.CreateOrderRequest_MonetaryValue:
+		entity.Price = new(utils.MoneyToDecimal(request.GetMonetaryValue()))
+	}
+
 	return entity
 }
 
@@ -55,13 +66,39 @@ func orderSideFromProto(side generated.OrderSide) domain.OrderSide {
 }
 
 func OrderToProto(entity *domain.Order) *generated.Order {
-	return &generated.Order{
+	proto := &generated.Order{
 		Id:             uuidToProto(entity.ID),
 		AccountId:      uuidToProto(entity.AccountID),
 		IdempotencyKey: uuidToProto(entity.IdempotencyKey),
 		InstrumentId:   uuidToProto(entity.InstrumentID),
-		Amount:         entity.Amount,
+		Quantity:       nil,
+		Amount:         nil,
+		Price:          nil,
+		Side:           orderSideToProto(entity.Side),
 		Status:         OrderStatusToProto(entity.Status),
+	}
+
+	if entity.Quantity != nil {
+		proto.Quantity = utils.DecimalToProto(*entity.Quantity)
+	}
+	if entity.Amount != nil {
+		proto.Amount = utils.DecimalToMoney(*entity.Amount)
+	}
+	if entity.Price != nil {
+		proto.Price = utils.DecimalToMoney(*entity.Price)
+	}
+
+	return proto
+}
+
+func orderSideToProto(entity domain.OrderSide) generated.OrderSide {
+	switch entity {
+	case domain.OrderSideBuy:
+		return generated.OrderSide_ORDER_SIDE_BUY
+	case domain.OrderSideSell:
+		return generated.OrderSide_ORDER_SIDE_SELL
+	default:
+		return generated.OrderSide_ORDER_SIDE_UNSPECIFIED
 	}
 }
 
