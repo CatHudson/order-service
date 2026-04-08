@@ -79,22 +79,22 @@ func (OrderStatus) EnumDescriptor() ([]byte, []int) {
 type OrderSide int32
 
 const (
-	OrderSide_OrderSide_UNSPECIFIED OrderSide = 0
-	OrderSide_OrderSide_BUY         OrderSide = 1
-	OrderSide_OrderSide_SELL        OrderSide = 2
+	OrderSide_ORDER_SIDE_UNSPECIFIED OrderSide = 0
+	OrderSide_ORDER_SIDE_BUY         OrderSide = 1
+	OrderSide_ORDER_SIDE_SELL        OrderSide = 2
 )
 
 // Enum value maps for OrderSide.
 var (
 	OrderSide_name = map[int32]string{
-		0: "OrderSide_UNSPECIFIED",
-		1: "OrderSide_BUY",
-		2: "OrderSide_SELL",
+		0: "ORDER_SIDE_UNSPECIFIED",
+		1: "ORDER_SIDE_BUY",
+		2: "ORDER_SIDE_SELL",
 	}
 	OrderSide_value = map[string]int32{
-		"OrderSide_UNSPECIFIED": 0,
-		"OrderSide_BUY":         1,
-		"OrderSide_SELL":        2,
+		"ORDER_SIDE_UNSPECIFIED": 0,
+		"ORDER_SIDE_BUY":         1,
+		"ORDER_SIDE_SELL":        2,
 	}
 )
 
@@ -207,7 +207,7 @@ func (x *Order) GetSide() OrderSide {
 	if x != nil {
 		return x.Side
 	}
-	return OrderSide_OrderSide_UNSPECIFIED
+	return OrderSide_ORDER_SIDE_UNSPECIFIED
 }
 
 func (x *Order) GetStatus() OrderStatus {
@@ -236,11 +236,11 @@ const file_order_proto_rawDesc = "" +
 	"\x10ORDER_STATUS_NEW\x10\x01\x12\x18\n" +
 	"\x14ORDER_STATUS_PENDING\x10\x02\x12\x1b\n" +
 	"\x17ORDER_STATUS_SUCCESSFUL\x10\x03\x12\x17\n" +
-	"\x13ORDER_STATUS_FAILED\x10\x04*M\n" +
-	"\tOrderSide\x12\x19\n" +
-	"\x15OrderSide_UNSPECIFIED\x10\x00\x12\x11\n" +
-	"\rOrderSide_BUY\x10\x01\x12\x12\n" +
-	"\x0eOrderSide_SELL\x10\x02B7Z5github.com/cathudson/order-service/internal/generatedb\x06proto3"
+	"\x13ORDER_STATUS_FAILED\x10\x04*P\n" +
+	"\tOrderSide\x12\x1a\n" +
+	"\x16ORDER_SIDE_UNSPECIFIED\x10\x00\x12\x12\n" +
+	"\x0eORDER_SIDE_BUY\x10\x01\x12\x13\n" +
+	"\x0fORDER_SIDE_SELL\x10\x02B7Z5github.com/cathudson/order-service/internal/generatedb\x06proto3"
 
 var (
 	file_order_proto_rawDescOnce sync.Once

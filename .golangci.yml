@@ -189,7 +189,6 @@ formatters:
       sections:
         - standard
         - default
-        - prefix(gitlab.diftech.org/invest/portfolio)
         - blank
         - dot
       custom-order: true

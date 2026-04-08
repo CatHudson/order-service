@@ -87,7 +87,7 @@ func (x *CreateOrderRequest) GetSide() OrderSide {
 	if x != nil {
 		return x.Side
 	}
-	return OrderSide_OrderSide_UNSPECIFIED
+	return OrderSide_ORDER_SIDE_UNSPECIFIED
 }
 
 func (x *CreateOrderRequest) GetAmount() uint64 {

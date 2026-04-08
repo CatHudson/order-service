@@ -42,7 +42,7 @@ func (h *createOrderHandler) validate(request *generated.CreateOrderRequest) err
 	if request.GetAmount() <= 0 {
 		return status.Errorf(codes.InvalidArgument, "invalid amount: %v", request.GetAmount())
 	}
-	if request.GetSide() == generated.OrderSide_OrderSide_UNSPECIFIED {
+	if request.GetSide() == generated.OrderSide_ORDER_SIDE_UNSPECIFIED {
 		return status.Errorf(codes.InvalidArgument, "invalid side: %v", request.GetSide())
 	}
 	if _, err := uuid.Parse(request.GetAccountId().GetValue()); err != nil {
