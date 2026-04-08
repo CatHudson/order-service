@@ -3,4 +3,3 @@ development:
   datasource: host=localhost port=5432 dbname=orders user=orders_user password=orders_pass sslmode=disable
   dir: migrations
   table: migrations
-  
