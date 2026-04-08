@@ -3,9 +3,12 @@ package main
 import (
 	"context"
 	"net"
+	"os/signal"
+	"syscall"
 
 	grpcApp "github.com/cathudson/order-service/internal/app"
 	"github.com/cathudson/order-service/internal/generated"
+	"github.com/cathudson/order-service/internal/interceptors"
 	report "github.com/cathudson/order-service/internal/reporter"
 	"github.com/cathudson/order-service/internal/store"
 	"go.uber.org/zap"
@@ -18,7 +21,13 @@ func main() {
 	log := l.Sugar()
 	defer func() { _ = l.Sync() }()
 
-	ctx := context.Background()
+	ctx, cancel := signal.NotifyContext(context.Background(),
+		syscall.SIGINT,
+		syscall.SIGTERM,
+		syscall.SIGQUIT,
+		syscall.SIGHUP,
+	)
+	defer cancel()
 	lc := net.ListenConfig{}
 	listener, err := lc.Listen(ctx, "tcp", ":8081")
 	if err != nil {
@@ -28,12 +37,12 @@ func main() {
 
 	orderStore := store.NewOrderStore()
 
-	reporter := report.NewReporter(orderStore, log)
-	go reporter.Run()
-	defer reporter.Stop()
+	go report.NewReporter(ctx, orderStore, log).Run()
 
 	app := grpcApp.New(orderStore)
-	server := grpc.NewServer()
+	server := grpc.NewServer(
+		grpc.UnaryInterceptor(interceptors.RequestIDInterceptor),
+	)
 	generated.RegisterOrderServiceServer(server, app)
 	reflection.Register(server)
 	err = server.Serve(listener)
