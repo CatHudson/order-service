@@ -23,6 +23,55 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+type OrderBy int32
+
+const (
+	OrderBy_ORDER_BY_UNSPECIFIED OrderBy = 0
+	OrderBy_ORDER_BY_AMOUNT      OrderBy = 1
+	OrderBy_ORDER_BY_QUANTITY    OrderBy = 2
+)
+
+// Enum value maps for OrderBy.
+var (
+	OrderBy_name = map[int32]string{
+		0: "ORDER_BY_UNSPECIFIED",
+		1: "ORDER_BY_AMOUNT",
+		2: "ORDER_BY_QUANTITY",
+	}
+	OrderBy_value = map[string]int32{
+		"ORDER_BY_UNSPECIFIED": 0,
+		"ORDER_BY_AMOUNT":      1,
+		"ORDER_BY_QUANTITY":    2,
+	}
+)
+
+func (x OrderBy) Enum() *OrderBy {
+	p := new(OrderBy)
+	*p = x
+	return p
+}
+
+func (x OrderBy) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (OrderBy) Descriptor() protoreflect.EnumDescriptor {
+	return file_order_proto_enumTypes[0].Descriptor()
+}
+
+func (OrderBy) Type() protoreflect.EnumType {
+	return &file_order_proto_enumTypes[0]
+}
+
+func (x OrderBy) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use OrderBy.Descriptor instead.
+func (OrderBy) EnumDescriptor() ([]byte, []int) {
+	return file_order_proto_rawDescGZIP(), []int{0}
+}
+
 type OrderStatus int32
 
 const (
@@ -31,6 +80,7 @@ const (
 	OrderStatus_ORDER_STATUS_PENDING     OrderStatus = 2
 	OrderStatus_ORDER_STATUS_SUCCESSFUL  OrderStatus = 3
 	OrderStatus_ORDER_STATUS_FAILED      OrderStatus = 4
+	OrderStatus_ORDER_STATUS_CANCELED    OrderStatus = 5
 )
 
 // Enum value maps for OrderStatus.
@@ -41,6 +91,7 @@ var (
 		2: "ORDER_STATUS_PENDING",
 		3: "ORDER_STATUS_SUCCESSFUL",
 		4: "ORDER_STATUS_FAILED",
+		5: "ORDER_STATUS_CANCELED",
 	}
 	OrderStatus_value = map[string]int32{
 		"ORDER_STATUS_UNSPECIFIED": 0,
@@ -48,6 +99,7 @@ var (
 		"ORDER_STATUS_PENDING":     2,
 		"ORDER_STATUS_SUCCESSFUL":  3,
 		"ORDER_STATUS_FAILED":      4,
+		"ORDER_STATUS_CANCELED":    5,
 	}
 )
 
@@ -62,11 +114,11 @@ func (x OrderStatus) String() string {
 }
 
 func (OrderStatus) Descriptor() protoreflect.EnumDescriptor {
-	return file_order_proto_enumTypes[0].Descriptor()
+	return file_order_proto_enumTypes[1].Descriptor()
 }
 
 func (OrderStatus) Type() protoreflect.EnumType {
-	return &file_order_proto_enumTypes[0]
+	return &file_order_proto_enumTypes[1]
 }
 
 func (x OrderStatus) Number() protoreflect.EnumNumber {
@@ -75,7 +127,7 @@ func (x OrderStatus) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use OrderStatus.Descriptor instead.
 func (OrderStatus) EnumDescriptor() ([]byte, []int) {
-	return file_order_proto_rawDescGZIP(), []int{0}
+	return file_order_proto_rawDescGZIP(), []int{1}
 }
 
 type OrderSide int32
@@ -111,11 +163,11 @@ func (x OrderSide) String() string {
 }
 
 func (OrderSide) Descriptor() protoreflect.EnumDescriptor {
-	return file_order_proto_enumTypes[1].Descriptor()
+	return file_order_proto_enumTypes[2].Descriptor()
 }
 
 func (OrderSide) Type() protoreflect.EnumType {
-	return &file_order_proto_enumTypes[1]
+	return &file_order_proto_enumTypes[2]
 }
 
 func (x OrderSide) Number() protoreflect.EnumNumber {
@@ -124,7 +176,7 @@ func (x OrderSide) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use OrderSide.Descriptor instead.
 func (OrderSide) EnumDescriptor() ([]byte, []int) {
-	return file_order_proto_rawDescGZIP(), []int{1}
+	return file_order_proto_rawDescGZIP(), []int{2}
 }
 
 type Order struct {
@@ -133,11 +185,12 @@ type Order struct {
 	AccountId      *UUID                  `protobuf:"bytes,2,opt,name=account_id,json=accountId,proto3" json:"account_id,omitempty"`
 	IdempotencyKey *UUID                  `protobuf:"bytes,3,opt,name=idempotency_key,json=idempotencyKey,proto3" json:"idempotency_key,omitempty"`
 	InstrumentId   *UUID                  `protobuf:"bytes,4,opt,name=instrument_id,json=instrumentId,proto3" json:"instrument_id,omitempty"`
-	Quantity       *decimal.Decimal       `protobuf:"bytes,5,opt,name=quantity,proto3,oneof" json:"quantity,omitempty"`
-	Amount         *money.Money           `protobuf:"bytes,6,opt,name=amount,proto3,oneof" json:"amount,omitempty"`
-	Price          *money.Money           `protobuf:"bytes,7,opt,name=price,proto3,oneof" json:"price,omitempty"`
-	Side           OrderSide              `protobuf:"varint,8,opt,name=side,proto3,enum=order.v1.OrderSide" json:"side,omitempty"`
-	Status         OrderStatus            `protobuf:"varint,9,opt,name=status,proto3,enum=order.v1.OrderStatus" json:"status,omitempty"`
+	OrderBy        OrderBy                `protobuf:"varint,5,opt,name=order_by,json=orderBy,proto3,enum=order.v1.OrderBy" json:"order_by,omitempty"`
+	Quantity       *decimal.Decimal       `protobuf:"bytes,6,opt,name=quantity,proto3,oneof" json:"quantity,omitempty"`
+	Amount         *money.Money           `protobuf:"bytes,7,opt,name=amount,proto3,oneof" json:"amount,omitempty"`
+	Price          *money.Money           `protobuf:"bytes,8,opt,name=price,proto3,oneof" json:"price,omitempty"`
+	Side           OrderSide              `protobuf:"varint,9,opt,name=side,proto3,enum=order.v1.OrderSide" json:"side,omitempty"`
+	Status         OrderStatus            `protobuf:"varint,10,opt,name=status,proto3,enum=order.v1.OrderStatus" json:"status,omitempty"`
 	unknownFields  protoimpl.UnknownFields
 	sizeCache      protoimpl.SizeCache
 }
@@ -200,6 +253,13 @@ func (x *Order) GetInstrumentId() *UUID {
 	return nil
 }
 
+func (x *Order) GetOrderBy() OrderBy {
+	if x != nil {
+		return x.OrderBy
+	}
+	return OrderBy_ORDER_BY_UNSPECIFIED
+}
+
 func (x *Order) GetQuantity() *decimal.Decimal {
 	if x != nil {
 		return x.Quantity
@@ -239,27 +299,34 @@ var File_order_proto protoreflect.FileDescriptor
 
 const file_order_proto_rawDesc = "" +
 	"\n" +
-	"\vorder.proto\x12\border.v1\x1a\vtypes.proto\x1a\x19google/type/decimal.proto\x1a\x17google/type/money.proto\"\xd5\x03\n" +
+	"\vorder.proto\x12\border.v1\x1a\vtypes.proto\x1a\x19google/type/decimal.proto\x1a\x17google/type/money.proto\"\x83\x04\n" +
 	"\x05Order\x12\x1e\n" +
 	"\x02id\x18\x01 \x01(\v2\x0e.order.v1.UUIDR\x02id\x12-\n" +
 	"\n" +
 	"account_id\x18\x02 \x01(\v2\x0e.order.v1.UUIDR\taccountId\x127\n" +
 	"\x0fidempotency_key\x18\x03 \x01(\v2\x0e.order.v1.UUIDR\x0eidempotencyKey\x123\n" +
-	"\rinstrument_id\x18\x04 \x01(\v2\x0e.order.v1.UUIDR\finstrumentId\x125\n" +
-	"\bquantity\x18\x05 \x01(\v2\x14.google.type.DecimalH\x00R\bquantity\x88\x01\x01\x12/\n" +
-	"\x06amount\x18\x06 \x01(\v2\x12.google.type.MoneyH\x01R\x06amount\x88\x01\x01\x12-\n" +
-	"\x05price\x18\a \x01(\v2\x12.google.type.MoneyH\x02R\x05price\x88\x01\x01\x12'\n" +
-	"\x04side\x18\b \x01(\x0e2\x13.order.v1.OrderSideR\x04side\x12-\n" +
-	"\x06status\x18\t \x01(\x0e2\x15.order.v1.OrderStatusR\x06statusB\v\n" +
+	"\rinstrument_id\x18\x04 \x01(\v2\x0e.order.v1.UUIDR\finstrumentId\x12,\n" +
+	"\border_by\x18\x05 \x01(\x0e2\x11.order.v1.OrderByR\aorderBy\x125\n" +
+	"\bquantity\x18\x06 \x01(\v2\x14.google.type.DecimalH\x00R\bquantity\x88\x01\x01\x12/\n" +
+	"\x06amount\x18\a \x01(\v2\x12.google.type.MoneyH\x01R\x06amount\x88\x01\x01\x12-\n" +
+	"\x05price\x18\b \x01(\v2\x12.google.type.MoneyH\x02R\x05price\x88\x01\x01\x12'\n" +
+	"\x04side\x18\t \x01(\x0e2\x13.order.v1.OrderSideR\x04side\x12-\n" +
+	"\x06status\x18\n" +
+	" \x01(\x0e2\x15.order.v1.OrderStatusR\x06statusB\v\n" +
 	"\t_quantityB\t\n" +
 	"\a_amountB\b\n" +
-	"\x06_price*\x91\x01\n" +
+	"\x06_price*O\n" +
+	"\aOrderBy\x12\x18\n" +
+	"\x14ORDER_BY_UNSPECIFIED\x10\x00\x12\x13\n" +
+	"\x0fORDER_BY_AMOUNT\x10\x01\x12\x15\n" +
+	"\x11ORDER_BY_QUANTITY\x10\x02*\xac\x01\n" +
 	"\vOrderStatus\x12\x1c\n" +
 	"\x18ORDER_STATUS_UNSPECIFIED\x10\x00\x12\x14\n" +
 	"\x10ORDER_STATUS_NEW\x10\x01\x12\x18\n" +
 	"\x14ORDER_STATUS_PENDING\x10\x02\x12\x1b\n" +
 	"\x17ORDER_STATUS_SUCCESSFUL\x10\x03\x12\x17\n" +
-	"\x13ORDER_STATUS_FAILED\x10\x04*P\n" +
+	"\x13ORDER_STATUS_FAILED\x10\x04\x12\x19\n" +
+	"\x15ORDER_STATUS_CANCELED\x10\x05*P\n" +
 	"\tOrderSide\x12\x1a\n" +
 	"\x16ORDER_SIDE_UNSPECIFIED\x10\x00\x12\x12\n" +
 	"\x0eORDER_SIDE_BUY\x10\x01\x12\x13\n" +
@@ -277,31 +344,33 @@ func file_order_proto_rawDescGZIP() []byte {
 	return file_order_proto_rawDescData
 }
 
-var file_order_proto_enumTypes = make([]protoimpl.EnumInfo, 2)
+var file_order_proto_enumTypes = make([]protoimpl.EnumInfo, 3)
 var file_order_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
 var file_order_proto_goTypes = []any{
-	(OrderStatus)(0),        // 0: order.v1.OrderStatus
-	(OrderSide)(0),          // 1: order.v1.OrderSide
-	(*Order)(nil),           // 2: order.v1.Order
-	(*UUID)(nil),            // 3: order.v1.UUID
-	(*decimal.Decimal)(nil), // 4: google.type.Decimal
-	(*money.Money)(nil),     // 5: google.type.Money
+	(OrderBy)(0),            // 0: order.v1.OrderBy
+	(OrderStatus)(0),        // 1: order.v1.OrderStatus
+	(OrderSide)(0),          // 2: order.v1.OrderSide
+	(*Order)(nil),           // 3: order.v1.Order
+	(*UUID)(nil),            // 4: order.v1.UUID
+	(*decimal.Decimal)(nil), // 5: google.type.Decimal
+	(*money.Money)(nil),     // 6: google.type.Money
 }
 var file_order_proto_depIdxs = []int32{
-	3, // 0: order.v1.Order.id:type_name -> order.v1.UUID
-	3, // 1: order.v1.Order.account_id:type_name -> order.v1.UUID
-	3, // 2: order.v1.Order.idempotency_key:type_name -> order.v1.UUID
-	3, // 3: order.v1.Order.instrument_id:type_name -> order.v1.UUID
-	4, // 4: order.v1.Order.quantity:type_name -> google.type.Decimal
-	5, // 5: order.v1.Order.amount:type_name -> google.type.Money
-	5, // 6: order.v1.Order.price:type_name -> google.type.Money
-	1, // 7: order.v1.Order.side:type_name -> order.v1.OrderSide
-	0, // 8: order.v1.Order.status:type_name -> order.v1.OrderStatus
-	9, // [9:9] is the sub-list for method output_type
-	9, // [9:9] is the sub-list for method input_type
-	9, // [9:9] is the sub-list for extension type_name
-	9, // [9:9] is the sub-list for extension extendee
-	0, // [0:9] is the sub-list for field type_name
+	4,  // 0: order.v1.Order.id:type_name -> order.v1.UUID
+	4,  // 1: order.v1.Order.account_id:type_name -> order.v1.UUID
+	4,  // 2: order.v1.Order.idempotency_key:type_name -> order.v1.UUID
+	4,  // 3: order.v1.Order.instrument_id:type_name -> order.v1.UUID
+	0,  // 4: order.v1.Order.order_by:type_name -> order.v1.OrderBy
+	5,  // 5: order.v1.Order.quantity:type_name -> google.type.Decimal
+	6,  // 6: order.v1.Order.amount:type_name -> google.type.Money
+	6,  // 7: order.v1.Order.price:type_name -> google.type.Money
+	2,  // 8: order.v1.Order.side:type_name -> order.v1.OrderSide
+	1,  // 9: order.v1.Order.status:type_name -> order.v1.OrderStatus
+	10, // [10:10] is the sub-list for method output_type
+	10, // [10:10] is the sub-list for method input_type
+	10, // [10:10] is the sub-list for extension type_name
+	10, // [10:10] is the sub-list for extension extendee
+	0,  // [0:10] is the sub-list for field type_name
 }
 
 func init() { file_order_proto_init() }
@@ -316,7 +385,7 @@ func file_order_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_order_proto_rawDesc), len(file_order_proto_rawDesc)),
-			NumEnums:      2,
+			NumEnums:      3,
 			NumMessages:   1,
 			NumExtensions: 0,
 			NumServices:   0,

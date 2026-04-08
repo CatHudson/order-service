@@ -9,6 +9,10 @@ import (
 	"github.com/google/uuid"
 )
 
+/*
+------------------------From proto
+*/
+
 func OrderFromCreateOrderRequest(request *generated.CreateOrderRequest, time time.Time) *domain.Order {
 	entity := &domain.Order{
 		ID:             uuid.New(),
@@ -16,6 +20,7 @@ func OrderFromCreateOrderRequest(request *generated.CreateOrderRequest, time tim
 		IdempotencyKey: uuid.MustParse(request.GetIdempotencyKey().GetValue()),
 		InstrumentID:   uuid.MustParse(request.GetInstrumentId().GetValue()),
 		Side:           orderSideFromProto(request.GetSide()),
+		OrderBy:        "",
 		Amount:         nil,
 		Price:          nil,
 		Quantity:       nil,
@@ -27,29 +32,13 @@ func OrderFromCreateOrderRequest(request *generated.CreateOrderRequest, time tim
 	switch request.GetAmount().(type) {
 	case *generated.CreateOrderRequest_Quantity:
 		entity.Quantity = new(utils.DecimalFromProto(request.GetQuantity()))
+		entity.OrderBy = domain.OrderByQuantity
 	case *generated.CreateOrderRequest_MonetaryValue:
-		entity.Price = new(utils.MoneyToDecimal(request.GetMonetaryValue()))
+		entity.Amount = new(utils.MoneyToDecimal(request.GetMonetaryValue()))
+		entity.OrderBy = domain.OrderByAmount
 	}
 
 	return entity
-}
-
-// nolint: unused // will be used later
-func orderStatusFromProto(status generated.OrderStatus) domain.OrderStatus {
-	switch status {
-	case generated.OrderStatus_ORDER_STATUS_NEW:
-		return domain.OrderStatusNew
-	case generated.OrderStatus_ORDER_STATUS_PENDING:
-		return domain.OrderStatusPending
-	case generated.OrderStatus_ORDER_STATUS_SUCCESSFUL:
-		return domain.OrderStatusSuccess
-	case generated.OrderStatus_ORDER_STATUS_FAILED:
-		return domain.OrderStatusFailed
-	case generated.OrderStatus_ORDER_STATUS_UNSPECIFIED:
-		return domain.OrderStatusNew
-	default:
-		return ""
-	}
 }
 
 func orderSideFromProto(side generated.OrderSide) domain.OrderSide {
@@ -65,12 +54,17 @@ func orderSideFromProto(side generated.OrderSide) domain.OrderSide {
 	}
 }
 
+/*
+------------------------To proto
+*/
+
 func OrderToProto(entity *domain.Order) *generated.Order {
 	proto := &generated.Order{
 		Id:             uuidToProto(entity.ID),
 		AccountId:      uuidToProto(entity.AccountID),
 		IdempotencyKey: uuidToProto(entity.IdempotencyKey),
 		InstrumentId:   uuidToProto(entity.InstrumentID),
+		OrderBy:        orderByToProto(entity.OrderBy),
 		Quantity:       nil,
 		Amount:         nil,
 		Price:          nil,
@@ -89,6 +83,17 @@ func OrderToProto(entity *domain.Order) *generated.Order {
 	}
 
 	return proto
+}
+
+func orderByToProto(orderBy domain.OrderBy) generated.OrderBy {
+	switch orderBy {
+	case domain.OrderByQuantity:
+		return generated.OrderBy_ORDER_BY_QUANTITY
+	case domain.OrderByAmount:
+		return generated.OrderBy_ORDER_BY_AMOUNT
+	default:
+		return generated.OrderBy_ORDER_BY_UNSPECIFIED
+	}
 }
 
 func orderSideToProto(entity domain.OrderSide) generated.OrderSide {
@@ -116,6 +121,8 @@ func OrderStatusToProto(status domain.OrderStatus) generated.OrderStatus {
 		return generated.OrderStatus_ORDER_STATUS_SUCCESSFUL
 	case domain.OrderStatusFailed:
 		return generated.OrderStatus_ORDER_STATUS_FAILED
+	case domain.OrderStatusCanceled:
+		return generated.OrderStatus_ORDER_STATUS_CANCELED
 	default:
 		return generated.OrderStatus_ORDER_STATUS_UNSPECIFIED
 	}

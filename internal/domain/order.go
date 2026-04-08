@@ -13,6 +13,7 @@ type Order struct {
 	IdempotencyKey uuid.UUID
 	InstrumentID   uuid.UUID
 	Side           OrderSide
+	OrderBy        OrderBy
 	Amount         *decimal.Decimal
 	Quantity       *decimal.Decimal
 	Price          *decimal.Decimal
@@ -21,13 +22,21 @@ type Order struct {
 	CreatedAt      time.Time
 }
 
+type OrderBy string
+
+const (
+	OrderByAmount   OrderBy = "AMOUNT"
+	OrderByQuantity OrderBy = "QUANTITY"
+)
+
 type OrderStatus string
 
 const (
-	OrderStatusNew     OrderStatus = "NEW"
-	OrderStatusPending OrderStatus = "PENDING"
-	OrderStatusSuccess OrderStatus = "SUCCESS"
-	OrderStatusFailed  OrderStatus = "FAILED"
+	OrderStatusNew      OrderStatus = "NEW"
+	OrderStatusPending  OrderStatus = "PENDING"
+	OrderStatusSuccess  OrderStatus = "SUCCESS"
+	OrderStatusFailed   OrderStatus = "FAILED"
+	OrderStatusCanceled OrderStatus = "CANCELED"
 )
 
 type OrderSide string
