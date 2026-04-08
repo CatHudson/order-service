@@ -8,6 +8,7 @@ import (
 	"github.com/cathudson/order-service/internal/mappers"
 	"github.com/cathudson/order-service/internal/store"
 	"github.com/google/uuid"
+	sdecimal "github.com/shopspring/decimal"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
@@ -39,8 +40,17 @@ func (h *createOrderHandler) handle(ctx context.Context, request *generated.Crea
 }
 
 func (h *createOrderHandler) validate(request *generated.CreateOrderRequest) error {
-	if request.GetAmount() <= 0 {
-		return status.Errorf(codes.InvalidArgument, "invalid amount: %v", request.GetAmount())
+	if request.GetMonetaryValue().GetUnits() < 0 || request.GetMonetaryValue().GetNanos() < 0 {
+		return status.Errorf(codes.InvalidArgument, "invalid monetary value: %v", request.GetMonetaryValue())
+	}
+	if request.GetQuantity() != nil {
+		decimal, err := sdecimal.NewFromString(request.GetQuantity().GetValue())
+		if err != nil {
+			return status.Errorf(codes.InvalidArgument, "invalid quantity: %v", err)
+		}
+		if decimal.LessThan(sdecimal.Zero) {
+			return status.Errorf(codes.InvalidArgument, "negative quantity not allowed: %v", decimal)
+		}
 	}
 	if request.GetSide() == generated.OrderSide_ORDER_SIDE_UNSPECIFIED {
 		return status.Errorf(codes.InvalidArgument, "invalid side: %v", request.GetSide())
