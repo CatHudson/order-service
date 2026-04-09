@@ -2,6 +2,7 @@ package store
 
 import (
 	"context"
+	"database/sql"
 	"errors"
 
 	"github.com/cathudson/order-service/internal/domain"
@@ -17,11 +18,11 @@ type OrderStore interface {
 }
 
 type orderStore struct {
-	// TODO: implement
+	conn *sql.DB
 }
 
-func NewOrderStore() OrderStore {
-	return &orderStore{}
+func NewOrderStore(conn *sql.DB) OrderStore {
+	return &orderStore{conn: conn}
 }
 
 // nolint: revive // Will implement later

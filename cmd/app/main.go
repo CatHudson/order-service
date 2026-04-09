@@ -2,11 +2,15 @@ package main
 
 import (
 	"context"
+	"fmt"
+	"log"
 	"net"
 	"os/signal"
 	"syscall"
 
 	grpcApp "github.com/cathudson/order-service/internal/app"
+	"github.com/cathudson/order-service/internal/config"
+	"github.com/cathudson/order-service/internal/db"
 	"github.com/cathudson/order-service/internal/generated"
 	"github.com/cathudson/order-service/internal/interceptors"
 	report "github.com/cathudson/order-service/internal/reporter"
@@ -17,12 +21,26 @@ import (
 )
 
 func main() {
+	if err := run(); err != nil {
+		log.Fatalf("error on startup: %v", err)
+	}
+}
+
+func run() error {
 	l, err := zap.NewDevelopment()
 	if err != nil {
-		panic(err)
+		return fmt.Errorf("failed to create logger: %w", err)
 	}
-	log := l.Sugar()
-	defer func() { _ = l.Sync() }()
+	defer func() {
+		_ = l.Sync()
+	}()
+
+	logger := l.Sugar()
+
+	cfg, err := config.Load("/config/config.yml")
+	if err != nil {
+		return fmt.Errorf("failed to load config: %w", err)
+	}
 
 	ctx, cancel := signal.NotifyContext(context.Background(),
 		syscall.SIGINT,
@@ -31,16 +49,23 @@ func main() {
 		syscall.SIGHUP,
 	)
 	defer cancel()
+
 	lc := net.ListenConfig{}
-	listener, err := lc.Listen(ctx, "tcp", ":8081")
+	listener, err := lc.Listen(ctx, cfg.GRPC.Network, fmt.Sprintf(":%d", cfg.GRPC.Port))
 	if err != nil {
-		log.Fatalf("failed to listen: %v", err) //nolint:gocritic // it is OK to forget log flush at this point
+		return fmt.Errorf("failed to listen: %w", err)
 	}
 	defer listener.Close()
 
-	orderStore := store.NewOrderStore()
+	dbConn, err := db.NewPostgresDB(ctx, cfg.Postgres)
+	if err != nil {
+		return fmt.Errorf("failed to connect to db: %w", err)
+	}
+	defer dbConn.Close()
 
-	go report.NewReporter(orderStore, log).Run(ctx)
+	orderStore := store.NewOrderStore(dbConn)
+
+	go report.NewReporter(orderStore, logger).Run(ctx)
 
 	app := grpcApp.New(orderStore)
 	server := grpc.NewServer(
@@ -54,7 +79,8 @@ func main() {
 	}()
 	err = server.Serve(listener)
 	if err != nil {
-		log.Infof("failed to serve: %v", err)
-		return
+		return fmt.Errorf("failed to serve: %w", err)
 	}
+
+	return nil
 }
