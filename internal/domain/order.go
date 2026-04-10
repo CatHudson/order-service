@@ -18,8 +18,9 @@ type Order struct {
 	Quantity       *decimal.Decimal
 	Price          *decimal.Decimal
 	Status         OrderStatus
-	UpdatedAt      time.Time
+	ErrorMessage   *string
 	CreatedAt      time.Time
+	UpdatedAt      time.Time
 }
 
 type OrderBy string

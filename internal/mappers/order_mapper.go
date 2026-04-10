@@ -1,8 +1,6 @@
 package mappers
 
 import (
-	"time"
-
 	"github.com/cathudson/order-service/internal/domain"
 	"github.com/cathudson/order-service/internal/generated"
 	"github.com/cathudson/order-service/internal/utils"
@@ -13,7 +11,7 @@ import (
 ------------------------From proto
 */
 
-func OrderFromCreateOrderRequest(request *generated.CreateOrderRequest, time time.Time) *domain.Order {
+func OrderFromCreateOrderRequest(request *generated.CreateOrderRequest) *domain.Order {
 	entity := &domain.Order{
 		ID:             uuid.New(),
 		AccountID:      uuid.MustParse(request.GetAccountId().GetValue()),
@@ -25,8 +23,7 @@ func OrderFromCreateOrderRequest(request *generated.CreateOrderRequest, time tim
 		Price:          nil,
 		Quantity:       nil,
 		Status:         domain.OrderStatusNew,
-		UpdatedAt:      time,
-		CreatedAt:      time,
+		ErrorMessage:   nil,
 	}
 
 	switch request.GetAmount().(type) {
@@ -70,6 +67,7 @@ func OrderToProto(entity *domain.Order) *generated.Order {
 		Price:          nil,
 		Side:           orderSideToProto(entity.Side),
 		Status:         OrderStatusToProto(entity.Status),
+		ErrorMessage:   entity.ErrorMessage,
 	}
 
 	if entity.Quantity != nil {

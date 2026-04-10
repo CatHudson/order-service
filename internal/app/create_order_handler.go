@@ -28,7 +28,7 @@ func (h *createOrderHandler) handle(ctx context.Context, request *generated.Crea
 		return nil, err
 	}
 
-	entity, err := h.orderStore.Create(ctx, mappers.OrderFromCreateOrderRequest(request, h.now()))
+	entity, err := h.orderStore.Create(ctx, mappers.OrderFromCreateOrderRequest(request))
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "error in store: %v", err)
 	}
