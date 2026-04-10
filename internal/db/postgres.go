@@ -2,16 +2,16 @@ package db
 
 import (
 	"context"
-	"database/sql"
 	"fmt"
 
 	"github.com/cathudson/order-service/internal/config"
+	"github.com/jmoiron/sqlx"
 
 	_ "github.com/jackc/pgx/v5/stdlib" // import pgx driver
 )
 
-func NewPostgresDB(ctx context.Context, cfg config.PostgresConfig) (*sql.DB, error) {
-	db, err := sql.Open(cfg.Driver, cfg.DSN())
+func NewPostgresDB(ctx context.Context, cfg config.PostgresConfig) (*sqlx.DB, error) {
+	db, err := sqlx.Open(cfg.Driver, cfg.DSN())
 	if err != nil {
 		return nil, fmt.Errorf("sql.Open: %w", err)
 	}

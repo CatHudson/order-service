@@ -1,6 +1,8 @@
 package mappers
 
 import (
+	"time"
+
 	"github.com/cathudson/order-service/internal/domain"
 	"github.com/cathudson/order-service/internal/generated"
 	"github.com/cathudson/order-service/internal/utils"
@@ -12,6 +14,7 @@ import (
 */
 
 func OrderFromCreateOrderRequest(request *generated.CreateOrderRequest) *domain.Order {
+	now := time.Now()
 	entity := &domain.Order{
 		ID:             uuid.New(),
 		AccountID:      uuid.MustParse(request.GetAccountId().GetValue()),
@@ -24,6 +27,8 @@ func OrderFromCreateOrderRequest(request *generated.CreateOrderRequest) *domain.
 		Quantity:       nil,
 		Status:         domain.OrderStatusNew,
 		ErrorMessage:   nil,
+		CreatedAt:      now,
+		UpdatedAt:      now,
 	}
 
 	switch request.GetAmount().(type) {

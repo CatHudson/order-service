@@ -8,19 +8,19 @@ import (
 )
 
 type Order struct {
-	ID             uuid.UUID
-	AccountID      uuid.UUID
-	IdempotencyKey uuid.UUID
-	InstrumentID   uuid.UUID
-	Side           OrderSide
-	OrderBy        OrderBy
-	Amount         *decimal.Decimal
-	Quantity       *decimal.Decimal
-	Price          *decimal.Decimal
-	Status         OrderStatus
-	ErrorMessage   *string
-	CreatedAt      time.Time
-	UpdatedAt      time.Time
+	ID             uuid.UUID        `db:"id"`
+	AccountID      uuid.UUID        `db:"account_id"`
+	IdempotencyKey uuid.UUID        `db:"idempotency_key"`
+	InstrumentID   uuid.UUID        `db:"instrument_id"`
+	Side           OrderSide        `db:"side"`
+	OrderBy        OrderBy          `db:"order_by"`
+	Amount         *decimal.Decimal `db:"amount"`
+	Quantity       *decimal.Decimal `db:"quantity"`
+	Price          *decimal.Decimal `db:"price"`
+	Status         OrderStatus      `db:"status"`
+	ErrorMessage   *string          `db:"error_message"`
+	UpdatedAt      time.Time        `db:"updated_at"`
+	CreatedAt      time.Time        `db:"created_at"`
 }
 
 type OrderBy string
