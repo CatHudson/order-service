@@ -19,6 +19,7 @@ message Order {
   optional google.type.Money price = 8;
   OrderSide side = 9;
   OrderStatus status = 10;
+  optional string error_message = 11;
 }
 
 enum OrderBy {

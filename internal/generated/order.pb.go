@@ -191,6 +191,7 @@ type Order struct {
 	Price          *money.Money           `protobuf:"bytes,8,opt,name=price,proto3,oneof" json:"price,omitempty"`
 	Side           OrderSide              `protobuf:"varint,9,opt,name=side,proto3,enum=order.v1.OrderSide" json:"side,omitempty"`
 	Status         OrderStatus            `protobuf:"varint,10,opt,name=status,proto3,enum=order.v1.OrderStatus" json:"status,omitempty"`
+	ErrorMessage   *string                `protobuf:"bytes,11,opt,name=error_message,json=errorMessage,proto3,oneof" json:"error_message,omitempty"`
 	unknownFields  protoimpl.UnknownFields
 	sizeCache      protoimpl.SizeCache
 }
@@ -295,11 +296,18 @@ func (x *Order) GetStatus() OrderStatus {
 	return OrderStatus_ORDER_STATUS_UNSPECIFIED
 }
 
+func (x *Order) GetErrorMessage() string {
+	if x != nil && x.ErrorMessage != nil {
+		return *x.ErrorMessage
+	}
+	return ""
+}
+
 var File_order_proto protoreflect.FileDescriptor
 
 const file_order_proto_rawDesc = "" +
 	"\n" +
-	"\vorder.proto\x12\border.v1\x1a\vtypes.proto\x1a\x19google/type/decimal.proto\x1a\x17google/type/money.proto\"\x83\x04\n" +
+	"\vorder.proto\x12\border.v1\x1a\vtypes.proto\x1a\x19google/type/decimal.proto\x1a\x17google/type/money.proto\"\xbf\x04\n" +
 	"\x05Order\x12\x1e\n" +
 	"\x02id\x18\x01 \x01(\v2\x0e.order.v1.UUIDR\x02id\x12-\n" +
 	"\n" +
@@ -312,10 +320,12 @@ const file_order_proto_rawDesc = "" +
 	"\x05price\x18\b \x01(\v2\x12.google.type.MoneyH\x02R\x05price\x88\x01\x01\x12'\n" +
 	"\x04side\x18\t \x01(\x0e2\x13.order.v1.OrderSideR\x04side\x12-\n" +
 	"\x06status\x18\n" +
-	" \x01(\x0e2\x15.order.v1.OrderStatusR\x06statusB\v\n" +
+	" \x01(\x0e2\x15.order.v1.OrderStatusR\x06status\x12(\n" +
+	"\rerror_message\x18\v \x01(\tH\x03R\ferrorMessage\x88\x01\x01B\v\n" +
 	"\t_quantityB\t\n" +
 	"\a_amountB\b\n" +
-	"\x06_price*O\n" +
+	"\x06_priceB\x10\n" +
+	"\x0e_error_message*O\n" +
 	"\aOrderBy\x12\x18\n" +
 	"\x14ORDER_BY_UNSPECIFIED\x10\x00\x12\x13\n" +
 	"\x0fORDER_BY_AMOUNT\x10\x01\x12\x15\n" +

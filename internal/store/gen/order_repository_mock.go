@@ -21,7 +21,7 @@ var _ store.OrderStore = &OrderStoreMock{}
 //
 //		// make and configure a mocked store.OrderStore
 //		mockedOrderStore := &OrderStoreMock{
-//			CreateFunc: func(ctx context.Context, order *domain.Order) (*domain.Order, error) {
+//			CreateFunc: func(ctx context.Context, order *domain.Order) error {
 //				panic("mock out the Create method")
 //			},
 //			GetAllByStatusFunc: func(ctx context.Context, status domain.OrderStatus) ([]*domain.Order, error) {
@@ -38,7 +38,7 @@ var _ store.OrderStore = &OrderStoreMock{}
 //	}
 type OrderStoreMock struct {
 	// CreateFunc mocks the Create method.
-	CreateFunc func(ctx context.Context, order *domain.Order) (*domain.Order, error)
+	CreateFunc func(ctx context.Context, order *domain.Order) error
 
 	// GetAllByStatusFunc mocks the GetAllByStatus method.
 	GetAllByStatusFunc func(ctx context.Context, status domain.OrderStatus) ([]*domain.Order, error)
@@ -76,7 +76,7 @@ type OrderStoreMock struct {
 }
 
 // Create calls CreateFunc.
-func (mock *OrderStoreMock) Create(ctx context.Context, order *domain.Order) (*domain.Order, error) {
+func (mock *OrderStoreMock) Create(ctx context.Context, order *domain.Order) error {
 	if mock.CreateFunc == nil {
 		panic("OrderStoreMock.CreateFunc: method is nil but OrderStore.Create was just called")
 	}
