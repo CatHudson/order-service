@@ -14,6 +14,7 @@ import (
 	"github.com/cathudson/order-service/internal/generated"
 	"github.com/cathudson/order-service/internal/interceptors"
 	report "github.com/cathudson/order-service/internal/reporter"
+	"github.com/cathudson/order-service/internal/service"
 	"github.com/cathudson/order-service/internal/store"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
@@ -27,6 +28,7 @@ func main() {
 }
 
 func run() error {
+	// logger
 	l, err := zap.NewDevelopment()
 	if err != nil {
 		return fmt.Errorf("failed to create logger: %w", err)
@@ -37,11 +39,13 @@ func run() error {
 
 	logger := l.Sugar()
 
+	// config
 	cfg, err := config.Load("/config/config.yml")
 	if err != nil {
 		return fmt.Errorf("failed to load config: %w", err)
 	}
 
+	// context
 	ctx, cancel := signal.NotifyContext(context.Background(),
 		syscall.SIGINT,
 		syscall.SIGTERM,
@@ -50,6 +54,7 @@ func run() error {
 	)
 	defer cancel()
 
+	// listener
 	lc := net.ListenConfig{}
 	listener, err := lc.Listen(ctx, cfg.GRPC.Network, fmt.Sprintf(":%d", cfg.GRPC.Port))
 	if err != nil {
@@ -57,17 +62,24 @@ func run() error {
 	}
 	defer listener.Close()
 
+	// DB stuff
 	dbConn, err := db.NewPostgresDB(ctx, cfg.Postgres)
 	if err != nil {
 		return fmt.Errorf("failed to connect to db: %w", err)
 	}
 	defer dbConn.Close()
+	tx := store.NewTransactor(dbConn)
 
 	orderStore := store.NewOrderStore(dbConn)
+	ordersAuditLogStore := store.NewOrdersAuditLogStore(dbConn)
 
+	orderService := service.NewOrderService(tx, orderStore, ordersAuditLogStore)
+
+	// goroutine reporter
 	go report.NewReporter(orderStore, logger).Run(ctx)
 
-	app := grpcApp.New(orderStore)
+	// app
+	app := grpcApp.New(orderService, orderStore)
 	server := grpc.NewServer(
 		grpc.UnaryInterceptor(interceptors.RequestIDInterceptor),
 	)
