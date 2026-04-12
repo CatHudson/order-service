@@ -14,11 +14,11 @@ import (
 )
 
 type createOrderHandler struct {
-	orderService service.OrderService
+	orderService *service.OrderService
 	now          func() time.Time
 }
 
-func newCreateOrderHandler(orderStore service.OrderService) *createOrderHandler {
+func newCreateOrderHandler(orderStore *service.OrderService) *createOrderHandler {
 	return &createOrderHandler{orderService: orderStore, now: time.Now}
 }
 

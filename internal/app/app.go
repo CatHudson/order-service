@@ -19,7 +19,7 @@ type App struct {
 func New(orderService *service.OrderService, orderStore store.OrderStore) *App {
 	return &App{
 		getHealthHandler:   newGetHealthHandler(),
-		createOrderHandler: newCreateOrderHandler(*orderService),
+		createOrderHandler: newCreateOrderHandler(orderService),
 		getOrderHandler:    newGetOrderHandler(orderStore),
 	}
 }
