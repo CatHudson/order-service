@@ -6,7 +6,7 @@ import (
 
 	"github.com/cathudson/order-service/internal/generated"
 	"github.com/cathudson/order-service/internal/mappers"
-	"github.com/cathudson/order-service/internal/store"
+	"github.com/cathudson/order-service/internal/service"
 	"github.com/google/uuid"
 	sdecimal "github.com/shopspring/decimal"
 	"google.golang.org/grpc/codes"
@@ -14,12 +14,12 @@ import (
 )
 
 type createOrderHandler struct {
-	orderStore store.OrderStore
-	now        func() time.Time
+	orderService *service.OrderService
+	now          func() time.Time
 }
 
-func newCreateOrderHandler(orderStore store.OrderStore) *createOrderHandler {
-	return &createOrderHandler{orderStore: orderStore, now: time.Now}
+func newCreateOrderHandler(orderStore *service.OrderService) *createOrderHandler {
+	return &createOrderHandler{orderService: orderStore, now: time.Now}
 }
 
 func (h *createOrderHandler) handle(ctx context.Context, request *generated.CreateOrderRequest) (*generated.CreateOrderResponse, error) {
@@ -29,7 +29,7 @@ func (h *createOrderHandler) handle(ctx context.Context, request *generated.Crea
 	}
 
 	entity := mappers.OrderFromCreateOrderRequest(request)
-	err = h.orderStore.Create(ctx, entity)
+	err = h.orderService.CreateOrder(ctx, entity)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "error in store: %v", err)
 	}

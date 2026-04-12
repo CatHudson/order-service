@@ -19,11 +19,11 @@ type OrderStore interface {
 }
 
 type orderStore struct {
-	conn *sqlx.DB
+	conn *ConnContainer
 }
 
-func NewOrderStore(conn *sqlx.DB) OrderStore {
-	return &orderStore{conn: conn}
+func NewOrderStore(db *sqlx.DB) OrderStore {
+	return &orderStore{conn: NewConnContainer(db)}
 }
 
 func (s *orderStore) Create(ctx context.Context, order *domain.Order) error {
@@ -41,21 +41,21 @@ func (s *orderStore) Create(ctx context.Context, order *domain.Order) error {
                     error_message,
                     created_at, 
                     updated_at) 
-	VALUES (:id, 
-	        :account_id, 
-	        :idempotency_key, 
-	        :instrument_id,
-            :order_by, 
-	        :side, 
-	        :amount, 
-	        :quantity, 
-	        :price,
-            :status, 
-	        :error_message, 
-	        :created_at, 
-	        :updated_at)`
+			VALUES (:id, 
+					:account_id, 
+					:idempotency_key, 
+					:instrument_id,
+					:order_by, 
+					:side, 
+					:amount, 
+					:quantity, 
+					:price,
+					:status, 
+					:error_message, 
+					:created_at, 
+					:updated_at)`
 
-	_, err := s.conn.NamedExecContext(ctx, query, order)
+	_, err := sqlx.NamedExecContext(ctx, s.conn.Primary(ctx), query, order)
 	if err != nil {
 		return err
 	}
@@ -67,7 +67,7 @@ func (s *orderStore) GetByID(ctx context.Context, id uuid.UUID) (*domain.Order, 
 	const query = `SELECT * FROM orders WHERE id = $1`
 
 	var order domain.Order
-	err := s.conn.GetContext(ctx, &order, query, id)
+	err := sqlx.GetContext(ctx, s.conn.Primary(ctx), &order, query, id)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, domain.ErrOrderNotFound
@@ -81,7 +81,7 @@ func (s *orderStore) GetAllByStatus(ctx context.Context, status domain.OrderStat
 	const query = `SELECT * FROM orders WHERE status = $1`
 
 	var orders []*domain.Order
-	err := s.conn.SelectContext(ctx, &orders, query, status)
+	err := sqlx.SelectContext(ctx, s.conn.Primary(ctx), &orders, query, status)
 	if err != nil {
 		return nil, err
 	}

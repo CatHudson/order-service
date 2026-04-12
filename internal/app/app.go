@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/cathudson/order-service/internal/generated"
+	"github.com/cathudson/order-service/internal/service"
 	"github.com/cathudson/order-service/internal/store"
 )
 
@@ -15,10 +16,10 @@ type App struct {
 	generated.UnimplementedOrderServiceServer
 }
 
-func New(orderStore store.OrderStore) *App {
+func New(orderService *service.OrderService, orderStore store.OrderStore) *App {
 	return &App{
 		getHealthHandler:   newGetHealthHandler(),
-		createOrderHandler: newCreateOrderHandler(orderStore),
+		createOrderHandler: newCreateOrderHandler(orderService),
 		getOrderHandler:    newGetOrderHandler(orderStore),
 	}
 }
