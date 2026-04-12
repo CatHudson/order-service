@@ -40,7 +40,7 @@ func run() error {
 	logger := l.Sugar()
 
 	// config
-	cfg, err := config.Load("/config/config.yml")
+	cfg, err := config.Load("config/config.yml")
 	if err != nil {
 		return fmt.Errorf("failed to load config: %w", err)
 	}

@@ -4,7 +4,7 @@ create table if not exists orders_audit_log (
     order_id      uuid         not null references orders(id),
     action        text         not null,
     payload       jsonb        not null,
-    created_at    timestampz   not null default now()
+    created_at    timestamptz   not null default now()
 );
 
 -- +migrate Down
