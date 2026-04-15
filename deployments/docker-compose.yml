@@ -1,17 +1,38 @@
 name: order-service
 
 services:
-  postgres:
+  postgres-primary:
     image: postgres:18-alpine
     environment:
       POSTGRES_DB: orders
       POSTGRES_USER: orders_user
       POSTGRES_PASSWORD: orders_pass
-      PGDATA: /var/lib/postgresql/data/pgdata
     ports:
       - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
+      - ./primary/init-replication-user.sql:/docker-entrypoint-initdb.d/init-replication-user.sql
+      - ./primary/pg_hba.conf:/etc/postgresql/pg_hba.conf
+    command: >
+      postgres
+      -c hba_file=/etc/postgresql/pg_hba.conf
+      -c wal_level=replica
+      -c max_wal_senders=3
+
+  postgres-replica:
+    image: postgres:18-alpine
+    environment:
+      PGPASSWORD: replicator_pass
+      PGDATA: /var/lib/postgresql/data
+    ports:
+      - "5433:5432"
+    volumes:
+      - pgreplica:/var/lib/postgresql/data
+      - ./replica/entrypoint.sh:/entrypoint.sh
+    entrypoint: /entrypoint.sh
+    depends_on:
+      - postgres-primary
 
 volumes:
   pgdata:
+  pgreplica:

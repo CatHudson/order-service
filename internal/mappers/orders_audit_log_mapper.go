@@ -5,12 +5,12 @@ import (
 	"time"
 
 	"github.com/cathudson/order-service/internal/domain"
-	"github.com/google/uuid"
+	"github.com/cathudson/order-service/internal/utils"
 )
 
 func OrderCreatedAuditLog(order *domain.Order) *domain.OrderAuditLog {
 	entity := &domain.OrderAuditLog{
-		ID:        uuid.New(),
+		ID:        utils.UUID(),
 		OrderID:   order.ID,
 		Action:    domain.OrderCreated,
 		Payload:   nil,

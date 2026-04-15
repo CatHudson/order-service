@@ -19,11 +19,11 @@ type OrderStore interface {
 }
 
 type orderStore struct {
-	conn *ConnContainer
+	conn DBGetter
 }
 
-func NewOrderStore(db *sqlx.DB) OrderStore {
-	return &orderStore{conn: NewConnContainer(db)}
+func NewOrderStore(db DBGetter) OrderStore {
+	return &orderStore{conn: db}
 }
 
 func (s *orderStore) Create(ctx context.Context, order *domain.Order) error {
@@ -67,7 +67,7 @@ func (s *orderStore) GetByID(ctx context.Context, id uuid.UUID) (*domain.Order, 
 	const query = `SELECT * FROM orders WHERE id = $1`
 
 	var order domain.Order
-	err := sqlx.GetContext(ctx, s.conn.Primary(ctx), &order, query, id)
+	err := sqlx.GetContext(ctx, s.conn.Replica(), &order, query, id)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, domain.ErrOrderNotFound
@@ -81,7 +81,7 @@ func (s *orderStore) GetAllByStatus(ctx context.Context, status domain.OrderStat
 	const query = `SELECT * FROM orders WHERE status = $1`
 
 	var orders []*domain.Order
-	err := sqlx.SelectContext(ctx, s.conn.Primary(ctx), &orders, query, status)
+	err := sqlx.SelectContext(ctx, s.conn.Replica(), &orders, query, status)
 	if err != nil {
 		return nil, err
 	}

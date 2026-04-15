@@ -3,14 +3,27 @@ grpc:
   port: 8081
 
 postgres:
-  driver: pgx
-  host: localhost
-  port: 5432
-  user: orders_user
-  password: orders_pass
-  database: orders
-  ssl_mode: disable
-  max_open_conns: 25
-  max_idle_conns: 25
-  conn_max_lifetime: 5m
-  conn_max_idle_time: 1m
+  primary:
+    driver: pgx
+    host: localhost
+    port: 5432
+    user: orders_user
+    password: orders_pass
+    database: orders
+    ssl_mode: disable
+    max_open_conns: 25
+    max_idle_conns: 25
+    conn_max_lifetime: 5m
+    conn_max_idle_time: 1m
+  replica:
+    driver: pgx
+    host: localhost
+    port: 5433
+    user: orders_user
+    password: orders_pass
+    database: orders
+    ssl_mode: disable
+    max_open_conns: 25
+    max_idle_conns: 25
+    conn_max_lifetime: 5m
+    conn_max_idle_time: 1m

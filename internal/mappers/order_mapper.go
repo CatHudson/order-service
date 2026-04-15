@@ -16,7 +16,7 @@ import (
 func OrderFromCreateOrderRequest(request *generated.CreateOrderRequest) *domain.Order {
 	now := time.Now()
 	entity := &domain.Order{
-		ID:             uuid.New(),
+		ID:             utils.UUID(),
 		AccountID:      uuid.MustParse(request.GetAccountId().GetValue()),
 		IdempotencyKey: uuid.MustParse(request.GetIdempotencyKey().GetValue()),
 		InstrumentID:   uuid.MustParse(request.GetInstrumentId().GetValue()),
