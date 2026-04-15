@@ -79,6 +79,8 @@ func run() error {
 	}
 	connContainer := store.NewConnContainer(primary, replica)
 
+	go store.NewReplicaHealthChecker(connContainer).Run(ctx)
+
 	tx := store.NewTransactor(primary)
 
 	orderStore := store.NewOrderStore(connContainer)

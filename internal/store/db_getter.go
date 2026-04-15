@@ -3,6 +3,7 @@ package store
 import (
 	"context"
 	"fmt"
+	"sync/atomic"
 
 	"github.com/jmoiron/sqlx"
 )
@@ -19,12 +20,13 @@ type DBGetter interface {
 type txKey struct{}
 
 type ConnContainer struct {
-	primary *sqlx.DB
-	replica *sqlx.DB
+	primary        *sqlx.DB
+	replica        *sqlx.DB
+	replicaHealthy atomic.Bool
 }
 
 func NewConnContainer(primary, replica *sqlx.DB) *ConnContainer {
-	return &ConnContainer{primary: primary, replica: replica}
+	return &ConnContainer{primary: primary, replica: replica, replicaHealthy: atomic.Bool{}}
 }
 
 func (c *ConnContainer) Primary(ctx context.Context) DB {
@@ -35,7 +37,7 @@ func (c *ConnContainer) Primary(ctx context.Context) DB {
 }
 
 func (c *ConnContainer) Replica() DB {
-	if c.replica != nil {
+	if c.replica != nil && c.replicaHealthy.Load() {
 		return c.replica
 	}
 	return c.primary
