@@ -7,9 +7,3 @@ option go_package = "github.com/cathudson/order-service/internal/generated";
 message UUID {
   string value = 1;
 }
-
-enum HealthStatus {
-  HEALTH_STATUS_UNSPECIFIED = 0;
-  HEALTH_STATUS_OK = 1;
-  HEALTH_STATUS_NOT_OK = 2;
-}

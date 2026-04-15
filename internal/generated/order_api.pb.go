@@ -277,86 +277,6 @@ func (x *GetOrderResponse) GetOrder() *Order {
 	return nil
 }
 
-type GetHealthRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *GetHealthRequest) Reset() {
-	*x = GetHealthRequest{}
-	mi := &file_order_api_proto_msgTypes[4]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *GetHealthRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*GetHealthRequest) ProtoMessage() {}
-
-func (x *GetHealthRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_order_api_proto_msgTypes[4]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use GetHealthRequest.ProtoReflect.Descriptor instead.
-func (*GetHealthRequest) Descriptor() ([]byte, []int) {
-	return file_order_api_proto_rawDescGZIP(), []int{4}
-}
-
-type GetHealthResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Status        HealthStatus           `protobuf:"varint,1,opt,name=status,proto3,enum=order.v1.HealthStatus" json:"status,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *GetHealthResponse) Reset() {
-	*x = GetHealthResponse{}
-	mi := &file_order_api_proto_msgTypes[5]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *GetHealthResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*GetHealthResponse) ProtoMessage() {}
-
-func (x *GetHealthResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_order_api_proto_msgTypes[5]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use GetHealthResponse.ProtoReflect.Descriptor instead.
-func (*GetHealthResponse) Descriptor() ([]byte, []int) {
-	return file_order_api_proto_rawDescGZIP(), []int{5}
-}
-
-func (x *GetHealthResponse) GetStatus() HealthStatus {
-	if x != nil {
-		return x.Status
-	}
-	return HealthStatus_HEALTH_STATUS_UNSPECIFIED
-}
-
 var File_order_api_proto protoreflect.FileDescriptor
 
 const file_order_api_proto_rawDesc = "" +
@@ -377,12 +297,8 @@ const file_order_api_proto_rawDesc = "" +
 	"\x0fGetOrderRequest\x12\x1e\n" +
 	"\x02id\x18\x01 \x01(\v2\x0e.order.v1.UUIDR\x02id\"9\n" +
 	"\x10GetOrderResponse\x12%\n" +
-	"\x05order\x18\x01 \x01(\v2\x0f.order.v1.OrderR\x05order\"\x12\n" +
-	"\x10GetHealthRequest\"C\n" +
-	"\x11GetHealthResponse\x12.\n" +
-	"\x06status\x18\x01 \x01(\x0e2\x16.order.v1.HealthStatusR\x06status2\xe3\x01\n" +
-	"\fOrderService\x12D\n" +
-	"\tGetHealth\x12\x1a.order.v1.GetHealthRequest\x1a\x1b.order.v1.GetHealthResponse\x12J\n" +
+	"\x05order\x18\x01 \x01(\v2\x0f.order.v1.OrderR\x05order2\x9d\x01\n" +
+	"\fOrderService\x12J\n" +
 	"\vCreateOrder\x12\x1c.order.v1.CreateOrderRequest\x1a\x1d.order.v1.CreateOrderResponse\x12A\n" +
 	"\bGetOrder\x12\x19.order.v1.GetOrderRequest\x1a\x1a.order.v1.GetOrderResponseB7Z5github.com/cathudson/order-service/internal/generatedb\x06proto3"
 
@@ -398,45 +314,39 @@ func file_order_api_proto_rawDescGZIP() []byte {
 	return file_order_api_proto_rawDescData
 }
 
-var file_order_api_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
+var file_order_api_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
 var file_order_api_proto_goTypes = []any{
 	(*CreateOrderRequest)(nil),  // 0: order.v1.CreateOrderRequest
 	(*CreateOrderResponse)(nil), // 1: order.v1.CreateOrderResponse
 	(*GetOrderRequest)(nil),     // 2: order.v1.GetOrderRequest
 	(*GetOrderResponse)(nil),    // 3: order.v1.GetOrderResponse
-	(*GetHealthRequest)(nil),    // 4: order.v1.GetHealthRequest
-	(*GetHealthResponse)(nil),   // 5: order.v1.GetHealthResponse
-	(*UUID)(nil),                // 6: order.v1.UUID
-	(OrderSide)(0),              // 7: order.v1.OrderSide
-	(*money.Money)(nil),         // 8: google.type.Money
-	(*decimal.Decimal)(nil),     // 9: google.type.Decimal
-	(OrderStatus)(0),            // 10: order.v1.OrderStatus
-	(*Order)(nil),               // 11: order.v1.Order
-	(HealthStatus)(0),           // 12: order.v1.HealthStatus
+	(*UUID)(nil),                // 4: order.v1.UUID
+	(OrderSide)(0),              // 5: order.v1.OrderSide
+	(*money.Money)(nil),         // 6: google.type.Money
+	(*decimal.Decimal)(nil),     // 7: google.type.Decimal
+	(OrderStatus)(0),            // 8: order.v1.OrderStatus
+	(*Order)(nil),               // 9: order.v1.Order
 }
 var file_order_api_proto_depIdxs = []int32{
-	6,  // 0: order.v1.CreateOrderRequest.instrument_id:type_name -> order.v1.UUID
-	6,  // 1: order.v1.CreateOrderRequest.account_id:type_name -> order.v1.UUID
-	6,  // 2: order.v1.CreateOrderRequest.idempotency_key:type_name -> order.v1.UUID
-	7,  // 3: order.v1.CreateOrderRequest.side:type_name -> order.v1.OrderSide
-	8,  // 4: order.v1.CreateOrderRequest.monetary_value:type_name -> google.type.Money
-	9,  // 5: order.v1.CreateOrderRequest.quantity:type_name -> google.type.Decimal
-	6,  // 6: order.v1.CreateOrderResponse.id:type_name -> order.v1.UUID
-	10, // 7: order.v1.CreateOrderResponse.status:type_name -> order.v1.OrderStatus
-	6,  // 8: order.v1.GetOrderRequest.id:type_name -> order.v1.UUID
-	11, // 9: order.v1.GetOrderResponse.order:type_name -> order.v1.Order
-	12, // 10: order.v1.GetHealthResponse.status:type_name -> order.v1.HealthStatus
-	4,  // 11: order.v1.OrderService.GetHealth:input_type -> order.v1.GetHealthRequest
-	0,  // 12: order.v1.OrderService.CreateOrder:input_type -> order.v1.CreateOrderRequest
-	2,  // 13: order.v1.OrderService.GetOrder:input_type -> order.v1.GetOrderRequest
-	5,  // 14: order.v1.OrderService.GetHealth:output_type -> order.v1.GetHealthResponse
-	1,  // 15: order.v1.OrderService.CreateOrder:output_type -> order.v1.CreateOrderResponse
-	3,  // 16: order.v1.OrderService.GetOrder:output_type -> order.v1.GetOrderResponse
-	14, // [14:17] is the sub-list for method output_type
-	11, // [11:14] is the sub-list for method input_type
-	11, // [11:11] is the sub-list for extension type_name
-	11, // [11:11] is the sub-list for extension extendee
-	0,  // [0:11] is the sub-list for field type_name
+	4,  // 0: order.v1.CreateOrderRequest.instrument_id:type_name -> order.v1.UUID
+	4,  // 1: order.v1.CreateOrderRequest.account_id:type_name -> order.v1.UUID
+	4,  // 2: order.v1.CreateOrderRequest.idempotency_key:type_name -> order.v1.UUID
+	5,  // 3: order.v1.CreateOrderRequest.side:type_name -> order.v1.OrderSide
+	6,  // 4: order.v1.CreateOrderRequest.monetary_value:type_name -> google.type.Money
+	7,  // 5: order.v1.CreateOrderRequest.quantity:type_name -> google.type.Decimal
+	4,  // 6: order.v1.CreateOrderResponse.id:type_name -> order.v1.UUID
+	8,  // 7: order.v1.CreateOrderResponse.status:type_name -> order.v1.OrderStatus
+	4,  // 8: order.v1.GetOrderRequest.id:type_name -> order.v1.UUID
+	9,  // 9: order.v1.GetOrderResponse.order:type_name -> order.v1.Order
+	0,  // 10: order.v1.OrderService.CreateOrder:input_type -> order.v1.CreateOrderRequest
+	2,  // 11: order.v1.OrderService.GetOrder:input_type -> order.v1.GetOrderRequest
+	1,  // 12: order.v1.OrderService.CreateOrder:output_type -> order.v1.CreateOrderResponse
+	3,  // 13: order.v1.OrderService.GetOrder:output_type -> order.v1.GetOrderResponse
+	12, // [12:14] is the sub-list for method output_type
+	10, // [10:12] is the sub-list for method input_type
+	10, // [10:10] is the sub-list for extension type_name
+	10, // [10:10] is the sub-list for extension extendee
+	0,  // [0:10] is the sub-list for field type_name
 }
 
 func init() { file_order_api_proto_init() }
@@ -456,7 +366,7 @@ func file_order_api_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_order_api_proto_rawDesc), len(file_order_api_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   6,
+			NumMessages:   4,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

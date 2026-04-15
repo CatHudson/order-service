@@ -9,7 +9,6 @@ import (
 )
 
 type App struct {
-	getHealthHandler   *getHealthHandler
 	createOrderHandler *createOrderHandler
 	getOrderHandler    *getOrderHandler
 
@@ -18,14 +17,9 @@ type App struct {
 
 func New(orderService *service.OrderService, orderStore store.OrderStore) *App {
 	return &App{
-		getHealthHandler:   newGetHealthHandler(),
 		createOrderHandler: newCreateOrderHandler(orderService),
 		getOrderHandler:    newGetOrderHandler(orderStore),
 	}
-}
-
-func (a *App) GetHealth(ctx context.Context, request *generated.GetHealthRequest) (*generated.GetHealthResponse, error) {
-	return a.getHealthHandler.handle(ctx, request)
 }
 
 func (a *App) CreateOrder(ctx context.Context, request *generated.CreateOrderRequest) (*generated.CreateOrderResponse, error) {

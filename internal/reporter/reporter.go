@@ -35,7 +35,7 @@ func (r *Reporter) Run(ctx context.Context) {
 			orders, err := r.orderStore.GetAllByStatus(queryCtx, domain.OrderStatusPending)
 			if err != nil {
 				r.log.Errorf(
-					"error in store: %v", err)
+					"error in reporter looking for PENDING orders in orders-store: %v", err)
 			} else {
 				r.log.Infof("found %d orders in pending", len(orders))
 			}

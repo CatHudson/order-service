@@ -10,7 +10,6 @@ import "google/type/money.proto";
 option go_package = "github.com/cathudson/order-service/internal/generated";
 
 service OrderService {
-  rpc GetHealth(GetHealthRequest) returns (GetHealthResponse);
   rpc CreateOrder(CreateOrderRequest) returns (CreateOrderResponse);
   rpc GetOrder(GetOrderRequest) returns (GetOrderResponse);
 }
@@ -37,10 +36,4 @@ message GetOrderRequest {
 
 message GetOrderResponse {
   Order order = 1;
-}
-
-message GetHealthRequest {}
-
-message GetHealthResponse {
-  HealthStatus status = 1;
 }

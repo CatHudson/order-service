@@ -12,6 +12,7 @@ import (
 	"github.com/cathudson/order-service/internal/config"
 	"github.com/cathudson/order-service/internal/db"
 	"github.com/cathudson/order-service/internal/generated"
+	"github.com/cathudson/order-service/internal/health"
 	"github.com/cathudson/order-service/internal/interceptors"
 	report "github.com/cathudson/order-service/internal/reporter"
 	"github.com/cathudson/order-service/internal/service"
@@ -19,6 +20,8 @@ import (
 	"github.com/jmoiron/sqlx"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
+	gh "google.golang.org/grpc/health"
+	"google.golang.org/grpc/health/grpc_health_v1"
 	"google.golang.org/grpc/reflection"
 )
 
@@ -72,14 +75,11 @@ func run() error {
 	defer primary.Close()
 	replica, err = db.NewPostgresDB(ctx, cfg.Postgres.Replica)
 	if err != nil {
-		logger.Warnf("failed to connect to Replica, falling back to Primary: %v", err)
-		replica = primary
+		logger.Warnf("failed to connect to Replica: %v", err)
 	} else {
 		defer replica.Close()
 	}
 	connContainer := store.NewConnContainer(primary, replica)
-
-	go store.NewReplicaHealthChecker(connContainer).Run(ctx)
 
 	tx := store.NewTransactor(primary)
 
@@ -96,11 +96,18 @@ func run() error {
 	server := grpc.NewServer(
 		grpc.UnaryInterceptor(interceptors.RequestIDInterceptor),
 	)
+
+	// health check
+	healthServer := gh.NewServer()
+	grpc_health_v1.RegisterHealthServer(server, healthServer)
+	go health.NewChecker(healthServer, primary, replica, connContainer.SetReplicaHealthy).Run(ctx)
+
 	generated.RegisterOrderServiceServer(server, app)
 	reflection.Register(server)
 	go func() {
 		<-ctx.Done()
 		server.GracefulStop()
+		healthServer.Shutdown()
 	}()
 	err = server.Serve(listener)
 	if err != nil {
