@@ -16,6 +16,7 @@ import (
 	report "github.com/cathudson/order-service/internal/reporter"
 	"github.com/cathudson/order-service/internal/service"
 	"github.com/cathudson/order-service/internal/store"
+	"github.com/jmoiron/sqlx"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
@@ -63,15 +64,25 @@ func run() error {
 	defer listener.Close()
 
 	// DB stuff
-	dbConn, err := db.NewPostgresDB(ctx, cfg.Postgres)
+	var primary, replica *sqlx.DB
+	primary, err = db.NewPostgresDB(ctx, cfg.Postgres.Primary)
 	if err != nil {
-		return fmt.Errorf("failed to connect to db: %w", err)
+		return fmt.Errorf("failed to connect to Primary: %w", err)
 	}
-	defer dbConn.Close()
-	tx := store.NewTransactor(dbConn)
+	defer primary.Close()
+	replica, err = db.NewPostgresDB(ctx, cfg.Postgres.Replica)
+	if err != nil {
+		logger.Warnf("failed to connect to Replica, falling back to Primary: %v", err)
+		replica = primary
+	} else {
+		defer replica.Close()
+	}
+	connContainer := store.NewConnContainer(primary, replica)
 
-	orderStore := store.NewOrderStore(dbConn)
-	ordersAuditLogStore := store.NewOrdersAuditLogStore(dbConn)
+	tx := store.NewTransactor(primary)
+
+	orderStore := store.NewOrderStore(connContainer)
+	ordersAuditLogStore := store.NewOrdersAuditLogStore(connContainer)
 
 	orderService := service.NewOrderService(tx, orderStore, ordersAuditLogStore)
 

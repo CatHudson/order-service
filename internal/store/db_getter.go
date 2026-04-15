@@ -13,16 +13,18 @@ type DB interface {
 
 type DBGetter interface {
 	Primary(ctx context.Context) DB
+	Replica() DB
 }
 
 type txKey struct{}
 
 type ConnContainer struct {
 	primary *sqlx.DB
+	replica *sqlx.DB
 }
 
-func NewConnContainer(db *sqlx.DB) *ConnContainer {
-	return &ConnContainer{primary: db}
+func NewConnContainer(primary, replica *sqlx.DB) *ConnContainer {
+	return &ConnContainer{primary: primary, replica: replica}
 }
 
 func (c *ConnContainer) Primary(ctx context.Context) DB {
@@ -32,16 +34,23 @@ func (c *ConnContainer) Primary(ctx context.Context) DB {
 	return c.primary
 }
 
+func (c *ConnContainer) Replica() DB {
+	if c.replica != nil {
+		return c.replica
+	}
+	return c.primary
+}
+
 type DBTransactor interface {
 	Exec(ctx context.Context, fn func(txCtx context.Context) error) error
 }
 
 type Transactor struct {
-	db *sqlx.DB
+	primary *sqlx.DB
 }
 
-func NewTransactor(db *sqlx.DB) *Transactor {
-	return &Transactor{db: db}
+func NewTransactor(primary *sqlx.DB) *Transactor {
+	return &Transactor{primary: primary}
 }
 
 func (t *Transactor) Exec(ctx context.Context, fn func(txCtx context.Context) error) error {
@@ -49,7 +58,7 @@ func (t *Transactor) Exec(ctx context.Context, fn func(txCtx context.Context) er
 		return fn(ctx)
 	}
 
-	transaction, err := t.db.BeginTxx(ctx, nil)
+	transaction, err := t.primary.BeginTxx(ctx, nil)
 	if err != nil {
 		return fmt.Errorf("begin transaction: %w", err)
 	}

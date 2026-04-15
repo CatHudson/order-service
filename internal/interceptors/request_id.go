@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/cathudson/order-service/internal/requestid"
-	"github.com/google/uuid"
+	"github.com/cathudson/order-service/internal/utils"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
 )
@@ -24,7 +24,7 @@ func extractOrDefault(ctx context.Context) string {
 		}
 	}
 	if requestID == "" {
-		requestID = uuid.New().String()
+		requestID = utils.UUID().String()
 	}
 	return requestID
 }

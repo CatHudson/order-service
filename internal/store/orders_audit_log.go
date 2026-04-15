@@ -12,11 +12,11 @@ type OrdersAuditLogStore interface {
 }
 
 type ordersAuditLogStore struct {
-	conn *ConnContainer
+	conn DBGetter
 }
 
-func NewOrdersAuditLogStore(db *sqlx.DB) OrdersAuditLogStore {
-	return &ordersAuditLogStore{conn: NewConnContainer(db)}
+func NewOrdersAuditLogStore(db DBGetter) OrdersAuditLogStore {
+	return &ordersAuditLogStore{conn: db}
 }
 
 func (s *ordersAuditLogStore) Create(ctx context.Context, auditLog *domain.OrderAuditLog) error {

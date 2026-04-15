@@ -10,13 +10,18 @@ import (
 )
 
 type Config struct {
-	GRPC     GRPCConfig     `yaml:"grpc"`
-	Postgres PostgresConfig `yaml:"postgres"`
+	GRPC     GRPCConfig        `yaml:"grpc"`
+	Postgres PrimaryAndReplica `yaml:"postgres"`
 }
 
 type GRPCConfig struct {
 	Network string `yaml:"network"`
 	Port    int    `yaml:"port"`
+}
+
+type PrimaryAndReplica struct {
+	Primary PostgresConfig `yaml:"primary"`
+	Replica PostgresConfig `yaml:"replica"`
 }
 
 type PostgresConfig struct {
