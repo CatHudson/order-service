@@ -43,6 +43,10 @@ func (c *ConnContainer) Replica() DB {
 	return c.primary
 }
 
+func (c *ConnContainer) SetReplicaHealthy(isHealthy bool) {
+	c.replicaHealthy.Store(isHealthy)
+}
+
 type DBTransactor interface {
 	Exec(ctx context.Context, fn func(txCtx context.Context) error) error
 }

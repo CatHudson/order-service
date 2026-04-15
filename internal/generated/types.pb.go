@@ -21,55 +21,6 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-type HealthStatus int32
-
-const (
-	HealthStatus_HEALTH_STATUS_UNSPECIFIED HealthStatus = 0
-	HealthStatus_HEALTH_STATUS_OK          HealthStatus = 1
-	HealthStatus_HEALTH_STATUS_NOT_OK      HealthStatus = 2
-)
-
-// Enum value maps for HealthStatus.
-var (
-	HealthStatus_name = map[int32]string{
-		0: "HEALTH_STATUS_UNSPECIFIED",
-		1: "HEALTH_STATUS_OK",
-		2: "HEALTH_STATUS_NOT_OK",
-	}
-	HealthStatus_value = map[string]int32{
-		"HEALTH_STATUS_UNSPECIFIED": 0,
-		"HEALTH_STATUS_OK":          1,
-		"HEALTH_STATUS_NOT_OK":      2,
-	}
-)
-
-func (x HealthStatus) Enum() *HealthStatus {
-	p := new(HealthStatus)
-	*p = x
-	return p
-}
-
-func (x HealthStatus) String() string {
-	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
-}
-
-func (HealthStatus) Descriptor() protoreflect.EnumDescriptor {
-	return file_types_proto_enumTypes[0].Descriptor()
-}
-
-func (HealthStatus) Type() protoreflect.EnumType {
-	return &file_types_proto_enumTypes[0]
-}
-
-func (x HealthStatus) Number() protoreflect.EnumNumber {
-	return protoreflect.EnumNumber(x)
-}
-
-// Deprecated: Use HealthStatus.Descriptor instead.
-func (HealthStatus) EnumDescriptor() ([]byte, []int) {
-	return file_types_proto_rawDescGZIP(), []int{0}
-}
-
 type UUID struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Value         string                 `protobuf:"bytes,1,opt,name=value,proto3" json:"value,omitempty"`
@@ -120,11 +71,7 @@ const file_types_proto_rawDesc = "" +
 	"\n" +
 	"\vtypes.proto\x12\border.v1\"\x1c\n" +
 	"\x04UUID\x12\x14\n" +
-	"\x05value\x18\x01 \x01(\tR\x05value*]\n" +
-	"\fHealthStatus\x12\x1d\n" +
-	"\x19HEALTH_STATUS_UNSPECIFIED\x10\x00\x12\x14\n" +
-	"\x10HEALTH_STATUS_OK\x10\x01\x12\x18\n" +
-	"\x14HEALTH_STATUS_NOT_OK\x10\x02B7Z5github.com/cathudson/order-service/internal/generatedb\x06proto3"
+	"\x05value\x18\x01 \x01(\tR\x05valueB7Z5github.com/cathudson/order-service/internal/generatedb\x06proto3"
 
 var (
 	file_types_proto_rawDescOnce sync.Once
@@ -138,11 +85,9 @@ func file_types_proto_rawDescGZIP() []byte {
 	return file_types_proto_rawDescData
 }
 
-var file_types_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
 var file_types_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
 var file_types_proto_goTypes = []any{
-	(HealthStatus)(0), // 0: order.v1.HealthStatus
-	(*UUID)(nil),      // 1: order.v1.UUID
+	(*UUID)(nil), // 0: order.v1.UUID
 }
 var file_types_proto_depIdxs = []int32{
 	0, // [0:0] is the sub-list for method output_type
@@ -162,14 +107,13 @@ func file_types_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_types_proto_rawDesc), len(file_types_proto_rawDesc)),
-			NumEnums:      1,
+			NumEnums:      0,
 			NumMessages:   1,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
 		GoTypes:           file_types_proto_goTypes,
 		DependencyIndexes: file_types_proto_depIdxs,
-		EnumInfos:         file_types_proto_enumTypes,
 		MessageInfos:      file_types_proto_msgTypes,
 	}.Build()
 	File_types_proto = out.File
