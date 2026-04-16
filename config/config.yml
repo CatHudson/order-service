@@ -27,3 +27,8 @@ postgres:
     max_idle_conns: 25
     conn_max_lifetime: 5m
     conn_max_idle_time: 1m
+
+kafka:
+  address: localhost:9092
+  producers:
+    createOrderTopic: "create-order"

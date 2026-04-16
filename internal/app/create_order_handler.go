@@ -2,11 +2,12 @@ package app
 
 import (
 	"context"
+	"fmt"
 	"time"
 
-	"github.com/cathudson/order-service/internal/generated"
 	"github.com/cathudson/order-service/internal/mappers"
-	"github.com/cathudson/order-service/internal/service"
+	"github.com/cathudson/order-service/internal/producer"
+	"github.com/cathudson/order-service/internal/proto"
 	"github.com/google/uuid"
 	sdecimal "github.com/shopspring/decimal"
 	"google.golang.org/grpc/codes"
@@ -14,33 +15,33 @@ import (
 )
 
 type createOrderHandler struct {
-	orderService *service.OrderService
-	now          func() time.Time
+	createOrderProducer producer.CreateOrderProducer
+	now                 func() time.Time
 }
 
-func newCreateOrderHandler(orderStore *service.OrderService) *createOrderHandler {
-	return &createOrderHandler{orderService: orderStore, now: time.Now}
+func newCreateOrderHandler(producer producer.CreateOrderProducer) *createOrderHandler {
+	return &createOrderHandler{createOrderProducer: producer, now: time.Now}
 }
 
-func (h *createOrderHandler) handle(ctx context.Context, request *generated.CreateOrderRequest) (*generated.CreateOrderResponse, error) {
+func (h *createOrderHandler) handle(ctx context.Context, request *proto.CreateOrderRequest) (*proto.CreateOrderResponse, error) {
 	err := h.validate(request)
 	if err != nil {
 		return nil, err
 	}
 
-	entity := mappers.OrderFromCreateOrderRequest(request)
-	err = h.orderService.CreateOrder(ctx, entity)
+	entity := mappers.CreateOrderEventFromGrpc(request)
+	err = h.createOrderProducer.Produce(ctx, entity)
 	if err != nil {
-		return nil, status.Errorf(codes.Internal, "error in store: %v", err)
+		return nil, status.Error(codes.Internal, fmt.Sprintf("create order producer failed: %v", err))
 	}
 
-	return &generated.CreateOrderResponse{
-		Id:     &generated.UUID{Value: entity.ID.String()},
-		Status: mappers.OrderStatusToProto(entity.Status),
+	return &proto.CreateOrderResponse{
+		Id:     entity.Id,
+		Status: proto.OrderStatus_ORDER_STATUS_NEW,
 	}, nil
 }
 
-func (h *createOrderHandler) validate(request *generated.CreateOrderRequest) error {
+func (h *createOrderHandler) validate(request *proto.CreateOrderRequest) error {
 	if request.GetMonetaryValue().GetUnits() < 0 || request.GetMonetaryValue().GetNanos() < 0 {
 		return status.Errorf(codes.InvalidArgument, "invalid monetary value: %v", request.GetMonetaryValue())
 	}
@@ -53,7 +54,7 @@ func (h *createOrderHandler) validate(request *generated.CreateOrderRequest) err
 			return status.Errorf(codes.InvalidArgument, "negative quantity not allowed: %v", decimal)
 		}
 	}
-	if request.GetSide() == generated.OrderSide_ORDER_SIDE_UNSPECIFIED {
+	if request.GetSide() == proto.OrderSide_ORDER_SIDE_UNSPECIFIED {
 		return status.Errorf(codes.InvalidArgument, "invalid side: %v", request.GetSide())
 	}
 	if _, err := uuid.Parse(request.GetAccountId().GetValue()); err != nil {

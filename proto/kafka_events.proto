@@ -5,10 +5,11 @@ package order.v1;
 import "types.proto";
 import "google/type/decimal.proto";
 import "google/type/money.proto";
+import "order.proto";
 
 option go_package = "github.com/cathudson/order-service/internal/proto";
 
-message Order {
+message CreateOrderEvent {
   UUID id = 1;
   UUID account_id = 2;
   UUID idempotency_key = 3;
@@ -18,27 +19,4 @@ message Order {
   optional google.type.Money amount = 7;
   optional google.type.Money price = 8;
   OrderSide side = 9;
-  OrderStatus status = 10;
-  optional string error_message = 11;
-}
-
-enum OrderBy {
-  ORDER_BY_UNSPECIFIED = 0;
-  ORDER_BY_AMOUNT = 1;
-  ORDER_BY_QUANTITY = 2;
-}
-
-enum OrderStatus {
-  ORDER_STATUS_UNSPECIFIED = 0;
-  ORDER_STATUS_NEW = 1;
-  ORDER_STATUS_PENDING = 2;
-  ORDER_STATUS_SUCCESSFUL = 3;
-  ORDER_STATUS_FAILED = 4;
-  ORDER_STATUS_CANCELED = 5;
-}
-
-enum OrderSide {
-  ORDER_SIDE_UNSPECIFIED = 0;
-  ORDER_SIDE_BUY = 1;
-  ORDER_SIDE_SELL = 2;
 }

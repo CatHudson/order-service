@@ -7,7 +7,7 @@ import "order.proto";
 import "google/type/decimal.proto";
 import "google/type/money.proto";
 
-option go_package = "github.com/cathudson/order-service/internal/generated";
+option go_package = "github.com/cathudson/order-service/internal/proto";
 
 service OrderService {
   rpc CreateOrder(CreateOrderRequest) returns (CreateOrderResponse);

@@ -4,7 +4,7 @@
 // - protoc             v7.34.1
 // source: order_api.proto
 
-package generated
+package proto
 
 import (
 	context "context"

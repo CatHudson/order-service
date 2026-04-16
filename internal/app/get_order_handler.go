@@ -5,8 +5,8 @@ import (
 	"errors"
 
 	"github.com/cathudson/order-service/internal/domain"
-	"github.com/cathudson/order-service/internal/generated"
 	"github.com/cathudson/order-service/internal/mappers"
+	"github.com/cathudson/order-service/internal/proto"
 	"github.com/cathudson/order-service/internal/store"
 	"github.com/google/uuid"
 	"google.golang.org/grpc/codes"
@@ -21,7 +21,7 @@ func newGetOrderHandler(orderStore store.OrderStore) *getOrderHandler {
 	return &getOrderHandler{orderStore: orderStore}
 }
 
-func (h *getOrderHandler) handle(ctx context.Context, request *generated.GetOrderRequest) (*generated.GetOrderResponse, error) {
+func (h *getOrderHandler) handle(ctx context.Context, request *proto.GetOrderRequest) (*proto.GetOrderResponse, error) {
 	err := h.validate(request)
 	if err != nil {
 		return nil, err
@@ -35,10 +35,10 @@ func (h *getOrderHandler) handle(ctx context.Context, request *generated.GetOrde
 		return nil, status.Errorf(codes.Internal, "store error: %v", err)
 	}
 
-	return &generated.GetOrderResponse{Order: mappers.OrderToProto(entity)}, nil
+	return &proto.GetOrderResponse{Order: mappers.OrderToProto(entity)}, nil
 }
 
-func (h *getOrderHandler) validate(request *generated.GetOrderRequest) error {
+func (h *getOrderHandler) validate(request *proto.GetOrderRequest) error {
 	_, err := uuid.Parse(request.GetId().GetValue())
 	if err != nil {
 		return status.Errorf(codes.InvalidArgument, "invalid id: %v", err)

@@ -4,7 +4,7 @@
 // 	protoc        v7.34.1
 // source: types.proto
 
-package generated
+package proto
 
 import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
@@ -71,7 +71,7 @@ const file_types_proto_rawDesc = "" +
 	"\n" +
 	"\vtypes.proto\x12\border.v1\"\x1c\n" +
 	"\x04UUID\x12\x14\n" +
-	"\x05value\x18\x01 \x01(\tR\x05valueB7Z5github.com/cathudson/order-service/internal/generatedb\x06proto3"
+	"\x05value\x18\x01 \x01(\tR\x05valueB3Z1github.com/cathudson/order-service/internal/protob\x06proto3"
 
 var (
 	file_types_proto_rawDescOnce sync.Once

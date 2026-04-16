@@ -4,7 +4,7 @@
 // 	protoc        v7.34.1
 // source: order.proto
 
-package generated
+package proto
 
 import (
 	decimal "google.golang.org/genproto/googleapis/type/decimal"
@@ -340,7 +340,7 @@ const file_order_proto_rawDesc = "" +
 	"\tOrderSide\x12\x1a\n" +
 	"\x16ORDER_SIDE_UNSPECIFIED\x10\x00\x12\x12\n" +
 	"\x0eORDER_SIDE_BUY\x10\x01\x12\x13\n" +
-	"\x0fORDER_SIDE_SELL\x10\x02B7Z5github.com/cathudson/order-service/internal/generatedb\x06proto3"
+	"\x0fORDER_SIDE_SELL\x10\x02B3Z1github.com/cathudson/order-service/internal/protob\x06proto3"
 
 var (
 	file_order_proto_rawDescOnce sync.Once

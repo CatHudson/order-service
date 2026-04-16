@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package order.v1;
 
-option go_package = "github.com/cathudson/order-service/internal/generated";
+option go_package = "github.com/cathudson/order-service/internal/proto";
 
 message UUID {
   string value = 1;
