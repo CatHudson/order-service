@@ -12,6 +12,16 @@ import (
 type Config struct {
 	GRPC     GRPCConfig        `yaml:"grpc"`
 	Postgres PrimaryAndReplica `yaml:"postgres"`
+	Kafka    KafkaConfig       `yaml:"kafka"`
+}
+
+type KafkaConfig struct {
+	Address   string              `yaml:"address"`
+	Producers KafkaProducerConfig `yaml:"producers"`
+}
+
+type KafkaProducerConfig struct {
+	CreateOrderTopic string `yaml:"createOrderTopic"`
 }
 
 type GRPCConfig struct {

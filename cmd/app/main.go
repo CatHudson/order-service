@@ -11,9 +11,10 @@ import (
 	grpcApp "github.com/cathudson/order-service/internal/app"
 	"github.com/cathudson/order-service/internal/config"
 	"github.com/cathudson/order-service/internal/db"
-	"github.com/cathudson/order-service/internal/generated"
 	"github.com/cathudson/order-service/internal/health"
 	"github.com/cathudson/order-service/internal/interceptors"
+	"github.com/cathudson/order-service/internal/producer"
+	"github.com/cathudson/order-service/internal/proto"
 	report "github.com/cathudson/order-service/internal/reporter"
 	"github.com/cathudson/order-service/internal/service"
 	"github.com/cathudson/order-service/internal/store"
@@ -86,13 +87,17 @@ func run() error {
 	orderStore := store.NewOrderStore(connContainer)
 	ordersAuditLogStore := store.NewOrdersAuditLogStore(connContainer)
 
-	orderService := service.NewOrderService(tx, orderStore, ordersAuditLogStore)
+	// services
+	_ = service.NewOrderService(tx, orderStore, ordersAuditLogStore)
+
+	// kafka
+	createOrderProducer := producer.NewCreateOrderProducer(cfg.Kafka)
 
 	// goroutine reporter
 	go report.NewReporter(orderStore, logger).Run(ctx)
 
 	// app
-	app := grpcApp.New(orderService, orderStore)
+	app := grpcApp.New(createOrderProducer, orderStore)
 	server := grpc.NewServer(
 		grpc.UnaryInterceptor(interceptors.RequestIDInterceptor),
 	)
@@ -100,14 +105,17 @@ func run() error {
 	// health check
 	healthServer := gh.NewServer()
 	grpc_health_v1.RegisterHealthServer(server, healthServer)
-	go health.NewChecker(healthServer, primary, replica, connContainer.SetReplicaHealthy).Run(ctx)
+	go health.NewWatcher(healthServer, primary, replica, connContainer.SetReplicaHealthy).Run(ctx)
 
-	generated.RegisterOrderServiceServer(server, app)
+	proto.RegisterOrderServiceServer(server, app)
 	reflection.Register(server)
 	go func() {
 		<-ctx.Done()
 		server.GracefulStop()
 		healthServer.Shutdown()
+		if err = createOrderProducer.Close(); err != nil {
+			logger.Errorf("failed to close producer: %v", err)
+		}
 	}()
 	err = server.Serve(listener)
 	if err != nil {

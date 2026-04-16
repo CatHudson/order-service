@@ -18,18 +18,18 @@ type Pinger interface {
 	PingContext(ctx context.Context) error
 }
 
-type Checker struct {
+type Watcher struct {
 	server          *health.Server
 	primary         Pinger
 	replica         Pinger
 	replicaCallback func(bool)
 }
 
-func NewChecker(server *health.Server, primary Pinger, replica Pinger, replicaCallback func(bool)) *Checker {
-	return &Checker{server: server, primary: primary, replica: replica, replicaCallback: replicaCallback}
+func NewWatcher(server *health.Server, primary Pinger, replica Pinger, replicaCallback func(bool)) *Watcher {
+	return &Watcher{server: server, primary: primary, replica: replica, replicaCallback: replicaCallback}
 }
 
-func (c *Checker) Run(ctx context.Context) {
+func (c *Watcher) Run(ctx context.Context) {
 	const tickInterval = time.Second * 10
 	ticker := time.NewTicker(tickInterval)
 	defer ticker.Stop()
@@ -46,7 +46,7 @@ func (c *Checker) Run(ctx context.Context) {
 	}
 }
 
-func (c *Checker) check(ctx context.Context) {
+func (c *Watcher) check(ctx context.Context) {
 	primaryHealthy := c.primary.PingContext(ctx) == nil
 	if primaryHealthy {
 		c.server.SetServingStatus(ServiceOverall, grpc_health_v1.HealthCheckResponse_SERVING)

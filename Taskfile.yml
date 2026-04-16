@@ -3,7 +3,7 @@ version: '3'
 
 vars:
   PROTO_DIR: proto
-  PROTO_GEN_DIR: internal/generated
+  PROTO_GEN_DIR: internal/proto
   PROTOC_GEN_GO_VERSION: v1.36.11
   PROTOC_GEN_GO_GRPC_VERSION: v1.6.1
   GOLANGCI_LINT_VERSION: v2.11.4
