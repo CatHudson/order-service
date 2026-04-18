@@ -1,16 +1,16 @@
-package mappers
+package mapper
 
 import (
 	"encoding/json"
 	"time"
 
 	"github.com/cathudson/order-service/internal/domain"
-	"github.com/cathudson/order-service/internal/utils"
+	"github.com/cathudson/order-service/internal/util"
 )
 
 func OrderCreatedAuditLog(order *domain.Order) *domain.OrderAuditLog {
 	entity := &domain.OrderAuditLog{
-		ID:        utils.UUID(),
+		ID:        util.UUID(),
 		OrderID:   order.ID,
 		Action:    domain.OrderCreated,
 		Payload:   nil,

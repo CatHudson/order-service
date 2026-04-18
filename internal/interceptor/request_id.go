@@ -1,10 +1,10 @@
-package interceptors
+package interceptor
 
 import (
 	"context"
 
 	"github.com/cathudson/order-service/internal/requestid"
-	"github.com/cathudson/order-service/internal/utils"
+	"github.com/cathudson/order-service/internal/util"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
 )
@@ -24,7 +24,7 @@ func extractOrDefault(ctx context.Context) string {
 		}
 	}
 	if requestID == "" {
-		requestID = utils.UUID().String()
+		requestID = util.UUID().String()
 	}
 	return requestID
 }

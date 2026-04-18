@@ -10,15 +10,19 @@ import (
 
 	grpcApp "github.com/cathudson/order-service/internal/app"
 	"github.com/cathudson/order-service/internal/config"
+	"github.com/cathudson/order-service/internal/consumer"
 	"github.com/cathudson/order-service/internal/db"
 	"github.com/cathudson/order-service/internal/health"
-	"github.com/cathudson/order-service/internal/interceptors"
+	"github.com/cathudson/order-service/internal/interceptor"
 	"github.com/cathudson/order-service/internal/producer"
 	"github.com/cathudson/order-service/internal/proto"
 	report "github.com/cathudson/order-service/internal/reporter"
 	"github.com/cathudson/order-service/internal/service"
 	"github.com/cathudson/order-service/internal/store"
+	"github.com/cathudson/order-service/internal/task"
+	"github.com/hibiken/asynq"
 	"github.com/jmoiron/sqlx"
+	"github.com/segmentio/kafka-go"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	gh "google.golang.org/grpc/health"
@@ -32,6 +36,7 @@ func main() {
 	}
 }
 
+//nolint:funlen
 func run() error {
 	// logger
 	l, err := zap.NewDevelopment()
@@ -90,8 +95,20 @@ func run() error {
 	// services
 	_ = service.NewOrderService(tx, orderStore, ordersAuditLogStore)
 
+	// asynq
+	asynqClient := task.NewAsynqClient(asynq.RedisClientOpt{Addr: cfg.Redis.Addr})
+	defer asynqClient.Close()
+
 	// kafka
 	createOrderProducer := producer.NewCreateOrderProducer(cfg.Kafka)
+	createOrderConsumer := consumer.NewCreateOrderConsumer(asynqClient, logger)
+	createOrderReader := kafka.NewReader(kafka.ReaderConfig{
+		Brokers: []string{cfg.Kafka.Address},
+		Topic:   cfg.Kafka.Consumers.CreateOrderTopic,
+		GroupID: cfg.Kafka.Consumers.GroupID,
+	})
+	runner := consumer.NewRunner(createOrderReader, createOrderConsumer, func() *proto.CreateOrderEvent { return &proto.CreateOrderEvent{} }, logger)
+	go runner.Run(ctx)
 
 	// goroutine reporter
 	go report.NewReporter(orderStore, logger).Run(ctx)
@@ -99,7 +116,7 @@ func run() error {
 	// app
 	app := grpcApp.New(createOrderProducer, orderStore)
 	server := grpc.NewServer(
-		grpc.UnaryInterceptor(interceptors.RequestIDInterceptor),
+		grpc.UnaryInterceptor(interceptor.RequestIDInterceptor),
 	)
 
 	// health check
@@ -113,6 +130,9 @@ func run() error {
 		<-ctx.Done()
 		server.GracefulStop()
 		healthServer.Shutdown()
+		if err = createOrderReader.Close(); err != nil {
+			logger.Errorf("failed to close consumer: %v", err)
+		}
 		if err = createOrderProducer.Close(); err != nil {
 			logger.Errorf("failed to close producer: %v", err)
 		}

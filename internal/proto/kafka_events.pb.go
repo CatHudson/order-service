@@ -32,8 +32,7 @@ type CreateOrderEvent struct {
 	OrderBy        OrderBy                `protobuf:"varint,5,opt,name=order_by,json=orderBy,proto3,enum=order.v1.OrderBy" json:"order_by,omitempty"`
 	Quantity       *decimal.Decimal       `protobuf:"bytes,6,opt,name=quantity,proto3,oneof" json:"quantity,omitempty"`
 	Amount         *money.Money           `protobuf:"bytes,7,opt,name=amount,proto3,oneof" json:"amount,omitempty"`
-	Price          *money.Money           `protobuf:"bytes,8,opt,name=price,proto3,oneof" json:"price,omitempty"`
-	Side           OrderSide              `protobuf:"varint,9,opt,name=side,proto3,enum=order.v1.OrderSide" json:"side,omitempty"`
+	Side           OrderSide              `protobuf:"varint,8,opt,name=side,proto3,enum=order.v1.OrderSide" json:"side,omitempty"`
 	unknownFields  protoimpl.UnknownFields
 	sizeCache      protoimpl.SizeCache
 }
@@ -117,13 +116,6 @@ func (x *CreateOrderEvent) GetAmount() *money.Money {
 	return nil
 }
 
-func (x *CreateOrderEvent) GetPrice() *money.Money {
-	if x != nil {
-		return x.Price
-	}
-	return nil
-}
-
 func (x *CreateOrderEvent) GetSide() OrderSide {
 	if x != nil {
 		return x.Side
@@ -135,7 +127,7 @@ var File_kafka_events_proto protoreflect.FileDescriptor
 
 const file_kafka_events_proto_rawDesc = "" +
 	"\n" +
-	"\x12kafka_events.proto\x12\border.v1\x1a\vtypes.proto\x1a\x19google/type/decimal.proto\x1a\x17google/type/money.proto\x1a\vorder.proto\"\xdf\x03\n" +
+	"\x12kafka_events.proto\x12\border.v1\x1a\vtypes.proto\x1a\x19google/type/decimal.proto\x1a\x17google/type/money.proto\x1a\vorder.proto\"\xa6\x03\n" +
 	"\x10CreateOrderEvent\x12\x1e\n" +
 	"\x02id\x18\x01 \x01(\v2\x0e.order.v1.UUIDR\x02id\x12-\n" +
 	"\n" +
@@ -144,12 +136,10 @@ const file_kafka_events_proto_rawDesc = "" +
 	"\rinstrument_id\x18\x04 \x01(\v2\x0e.order.v1.UUIDR\finstrumentId\x12,\n" +
 	"\border_by\x18\x05 \x01(\x0e2\x11.order.v1.OrderByR\aorderBy\x125\n" +
 	"\bquantity\x18\x06 \x01(\v2\x14.google.type.DecimalH\x00R\bquantity\x88\x01\x01\x12/\n" +
-	"\x06amount\x18\a \x01(\v2\x12.google.type.MoneyH\x01R\x06amount\x88\x01\x01\x12-\n" +
-	"\x05price\x18\b \x01(\v2\x12.google.type.MoneyH\x02R\x05price\x88\x01\x01\x12'\n" +
-	"\x04side\x18\t \x01(\x0e2\x13.order.v1.OrderSideR\x04sideB\v\n" +
+	"\x06amount\x18\a \x01(\v2\x12.google.type.MoneyH\x01R\x06amount\x88\x01\x01\x12'\n" +
+	"\x04side\x18\b \x01(\x0e2\x13.order.v1.OrderSideR\x04sideB\v\n" +
 	"\t_quantityB\t\n" +
-	"\a_amountB\b\n" +
-	"\x06_priceB3Z1github.com/cathudson/order-service/internal/protob\x06proto3"
+	"\a_amountB3Z1github.com/cathudson/order-service/internal/protob\x06proto3"
 
 var (
 	file_kafka_events_proto_rawDescOnce sync.Once
@@ -180,13 +170,12 @@ var file_kafka_events_proto_depIdxs = []int32{
 	2, // 4: order.v1.CreateOrderEvent.order_by:type_name -> order.v1.OrderBy
 	3, // 5: order.v1.CreateOrderEvent.quantity:type_name -> google.type.Decimal
 	4, // 6: order.v1.CreateOrderEvent.amount:type_name -> google.type.Money
-	4, // 7: order.v1.CreateOrderEvent.price:type_name -> google.type.Money
-	5, // 8: order.v1.CreateOrderEvent.side:type_name -> order.v1.OrderSide
-	9, // [9:9] is the sub-list for method output_type
-	9, // [9:9] is the sub-list for method input_type
-	9, // [9:9] is the sub-list for extension type_name
-	9, // [9:9] is the sub-list for extension extendee
-	0, // [0:9] is the sub-list for field type_name
+	5, // 7: order.v1.CreateOrderEvent.side:type_name -> order.v1.OrderSide
+	8, // [8:8] is the sub-list for method output_type
+	8, // [8:8] is the sub-list for method input_type
+	8, // [8:8] is the sub-list for extension type_name
+	8, // [8:8] is the sub-list for extension extendee
+	0, // [0:8] is the sub-list for field type_name
 }
 
 func init() { file_kafka_events_proto_init() }

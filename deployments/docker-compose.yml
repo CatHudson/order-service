@@ -33,6 +33,13 @@ services:
     depends_on:
       - postgres-primary
 
+  redis:
+    image: redis:8-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redisdata:/data
+
   kafka:
     image: apache/kafka:3.9.0
     ports:
@@ -78,3 +85,4 @@ volumes:
   pgdata:
   pgreplica:
   kafkadata:
+  redisdata:

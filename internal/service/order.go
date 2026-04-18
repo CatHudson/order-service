@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	"github.com/cathudson/order-service/internal/domain"
-	"github.com/cathudson/order-service/internal/mappers"
+	"github.com/cathudson/order-service/internal/mapper"
 	"github.com/cathudson/order-service/internal/store"
 )
 
@@ -29,7 +29,7 @@ func (s *OrderService) CreateOrder(ctx context.Context, order *domain.Order) err
 			return fmt.Errorf("create order: %w", err)
 		}
 
-		if err := s.ordersAuditLogStore.Create(txCtx, mappers.OrderCreatedAuditLog(order)); err != nil {
+		if err := s.ordersAuditLogStore.Create(txCtx, mapper.OrderCreatedAuditLog(order)); err != nil {
 			return fmt.Errorf("create audit log: %w", err)
 		}
 

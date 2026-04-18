@@ -28,7 +28,13 @@ postgres:
     conn_max_lifetime: 5m
     conn_max_idle_time: 1m
 
+redis:
+  address: localhost:6379
+
 kafka:
   address: localhost:9092
   producers:
     createOrderTopic: "create-order"
+  consumers:
+    createOrderTopic: "create-order"
+    groupId: "order-service"

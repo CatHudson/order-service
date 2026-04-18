@@ -13,11 +13,22 @@ type Config struct {
 	GRPC     GRPCConfig        `yaml:"grpc"`
 	Postgres PrimaryAndReplica `yaml:"postgres"`
 	Kafka    KafkaConfig       `yaml:"kafka"`
+	Redis    RedisConfig       `yaml:"redis"`
+}
+
+type RedisConfig struct {
+	Addr string `yaml:"address"`
 }
 
 type KafkaConfig struct {
 	Address   string              `yaml:"address"`
 	Producers KafkaProducerConfig `yaml:"producers"`
+	Consumers KafkaConsumerConfig `yaml:"consumers"`
+}
+
+type KafkaConsumerConfig struct {
+	CreateOrderTopic string `yaml:"createOrderTopic"`
+	GroupID          string `yaml:"groupId"`
 }
 
 type KafkaProducerConfig struct {

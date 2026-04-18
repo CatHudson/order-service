@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/cathudson/order-service/internal/mappers"
+	"github.com/cathudson/order-service/internal/mapper"
 	"github.com/cathudson/order-service/internal/producer"
 	"github.com/cathudson/order-service/internal/proto"
 	"github.com/google/uuid"
@@ -29,7 +29,7 @@ func (h *createOrderHandler) handle(ctx context.Context, request *proto.CreateOr
 		return nil, err
 	}
 
-	entity := mappers.CreateOrderEventFromGrpc(request)
+	entity := mapper.CreateOrderEventFromGrpc(request)
 	err = h.createOrderProducer.Produce(ctx, entity)
 	if err != nil {
 		return nil, status.Error(codes.Internal, fmt.Sprintf("create order producer failed: %v", err))

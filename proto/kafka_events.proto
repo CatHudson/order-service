@@ -17,6 +17,5 @@ message CreateOrderEvent {
   OrderBy order_by = 5;
   optional google.type.Decimal quantity = 6;
   optional google.type.Money amount = 7;
-  optional google.type.Money price = 8;
-  OrderSide side = 9;
+  OrderSide side = 8;
 }
