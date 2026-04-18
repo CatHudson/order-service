@@ -20,7 +20,7 @@ type CreateOrderConsumer struct {
 }
 
 func NewCreateOrderConsumer(asynq task.AsynqClient, logger *zap.SugaredLogger) *CreateOrderConsumer {
-	return &CreateOrderConsumer{asynq, logger}
+	return &CreateOrderConsumer{asynq: asynq, logger: logger}
 }
 
 func (c *CreateOrderConsumer) Handle(ctx context.Context, event *pe.CreateOrderEvent) error {

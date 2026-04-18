@@ -20,6 +20,7 @@ import (
 	"github.com/cathudson/order-service/internal/service"
 	"github.com/cathudson/order-service/internal/store"
 	"github.com/cathudson/order-service/internal/task"
+	"github.com/cathudson/order-service/internal/worker"
 	"github.com/hibiken/asynq"
 	"github.com/jmoiron/sqlx"
 	"github.com/segmentio/kafka-go"
@@ -81,7 +82,7 @@ func run() error {
 	defer primary.Close()
 	replica, err = db.NewPostgresDB(ctx, cfg.Postgres.Replica)
 	if err != nil {
-		logger.Warnf("failed to connect to Replica: %v", err)
+		logger.Warnw("failed to connect to Replica:", "error", err)
 	} else {
 		defer replica.Close()
 	}
@@ -93,11 +94,27 @@ func run() error {
 	ordersAuditLogStore := store.NewOrdersAuditLogStore(connContainer)
 
 	// services
-	_ = service.NewOrderService(tx, orderStore, ordersAuditLogStore)
+	orderService := service.NewOrderService(tx, orderStore, ordersAuditLogStore)
 
 	// asynq
+	mux := asynq.NewServeMux()
+	createOrderProcessor := worker.NewCreateOrderProcessor(orderService)
+	createOrderProcessor.Register(mux)
+
 	asynqClient := task.NewAsynqClient(asynq.RedisClientOpt{Addr: cfg.Redis.Addr})
 	defer asynqClient.Close()
+
+	asynqServer := asynq.NewServer(
+		asynq.RedisClientOpt{Addr: cfg.Redis.Addr},
+		asynq.Config{
+			Concurrency: cfg.Asynq.Concurrency,
+		},
+	)
+	err = asynqServer.Start(mux)
+	if err != nil {
+		return fmt.Errorf("failed to start asynq server: %w", err)
+	}
+	defer asynqServer.Stop()
 
 	// kafka
 	createOrderProducer := producer.NewCreateOrderProducer(cfg.Kafka)
@@ -130,6 +147,7 @@ func run() error {
 		<-ctx.Done()
 		server.GracefulStop()
 		healthServer.Shutdown()
+		asynqServer.Shutdown()
 		if err = createOrderReader.Close(); err != nil {
 			logger.Errorf("failed to close consumer: %v", err)
 		}
