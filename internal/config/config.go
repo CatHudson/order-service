@@ -14,6 +14,11 @@ type Config struct {
 	Postgres PrimaryAndReplica `yaml:"postgres"`
 	Kafka    KafkaConfig       `yaml:"kafka"`
 	Redis    RedisConfig       `yaml:"redis"`
+	Asynq    AsynqConfig       `yaml:"asynq"`
+}
+
+type AsynqConfig struct {
+	Concurrency int `yaml:"concurrency"`
 }
 
 type RedisConfig struct {

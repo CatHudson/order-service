@@ -31,6 +31,9 @@ postgres:
 redis:
   address: localhost:6379
 
+asynq:
+  concurrency: 10
+
 kafka:
   address: localhost:9092
   producers:

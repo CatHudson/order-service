@@ -4,9 +4,11 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"fmt"
 
 	"github.com/cathudson/order-service/internal/domain"
 	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/jmoiron/sqlx"
 )
 
@@ -57,6 +59,9 @@ func (s *orderStore) Create(ctx context.Context, order *domain.Order) error {
 
 	_, err := sqlx.NamedExecContext(ctx, s.conn.Primary(ctx), query, order)
 	if err != nil {
+		if pgErr, ok := errors.AsType[*pgconn.PgError](err); ok && pgErr.Code == "23505" {
+			return fmt.Errorf("%w: %w", domain.ErrOrderAlreadyExists, err)
+		}
 		return err
 	}
 
