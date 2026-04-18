@@ -1,4 +1,4 @@
-package utils
+package util
 
 import (
 	sdecimal "github.com/shopspring/decimal"

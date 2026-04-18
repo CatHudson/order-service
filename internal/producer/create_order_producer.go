@@ -2,6 +2,7 @@ package producer
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/cathudson/order-service/internal/config"
 	"github.com/cathudson/order-service/internal/proto"
@@ -32,14 +33,14 @@ func NewCreateOrderProducer(cfg config.KafkaConfig) CreateOrderProducer {
 func (c *createOrderProducer) Produce(ctx context.Context, event *proto.CreateOrderEvent) error {
 	value, err := protoxjson.Marshal(event)
 	if err != nil {
-		return err
+		return fmt.Errorf("marshal event in create-order-producer: %w", err)
 	}
 	err = c.writer.WriteMessages(ctx, kafka.Message{
 		Key:   []byte(event.GetAccountId().GetValue()),
 		Value: value,
 	})
 	if err != nil {
-		return err
+		return fmt.Errorf("write message in create-order-producer: %w", err)
 	}
 	return nil
 }

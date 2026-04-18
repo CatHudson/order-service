@@ -146,7 +146,7 @@ linters:
       - linters:
           - revive
         text: 'var-naming: avoid meaningless package names'
-        path: (internal/utils|test/utils)
+        path: (internal/util|test/util)
       - linters:
           - revive
         text: 'var-naming: avoid package names that conflict with Go standard library package names'

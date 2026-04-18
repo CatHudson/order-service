@@ -1,11 +1,9 @@
-package mappers
+package mapper
 
 import (
-	"time"
-
 	"github.com/cathudson/order-service/internal/domain"
 	"github.com/cathudson/order-service/internal/proto"
-	"github.com/cathudson/order-service/internal/utils"
+	"github.com/cathudson/order-service/internal/util"
 	"github.com/google/uuid"
 )
 
@@ -15,14 +13,13 @@ import (
 
 func CreateOrderEventFromGrpc(request *proto.CreateOrderRequest) *proto.CreateOrderEvent {
 	entity := &proto.CreateOrderEvent{
-		Id:             uuidToProto(utils.UUID()),
+		Id:             uuidToProto(util.UUID()),
 		AccountId:      request.GetAccountId(),
 		IdempotencyKey: request.GetIdempotencyKey(),
 		InstrumentId:   request.GetInstrumentId(),
 		OrderBy:        proto.OrderBy_ORDER_BY_UNSPECIFIED,
 		Quantity:       nil,
 		Amount:         nil,
-		Price:          nil,
 		Side:           request.GetSide(),
 	}
 
@@ -38,37 +35,20 @@ func CreateOrderEventFromGrpc(request *proto.CreateOrderRequest) *proto.CreateOr
 	return entity
 }
 
-func OrderFromCreateOrderRequest(request *proto.CreateOrderRequest) *domain.Order {
-	now := time.Now()
-	entity := &domain.Order{
-		ID:             utils.UUID(),
-		AccountID:      uuid.MustParse(request.GetAccountId().GetValue()),
-		IdempotencyKey: uuid.MustParse(request.GetIdempotencyKey().GetValue()),
-		InstrumentID:   uuid.MustParse(request.GetInstrumentId().GetValue()),
-		Side:           orderSideFromProto(request.GetSide()),
-		OrderBy:        "",
-		Amount:         nil,
-		Price:          nil,
-		Quantity:       nil,
-		Status:         domain.OrderStatusNew,
-		ErrorMessage:   nil,
-		CreatedAt:      now,
-		UpdatedAt:      now,
+func OrderByFromProto(side proto.OrderBy) domain.OrderBy {
+	switch side {
+	case proto.OrderBy_ORDER_BY_AMOUNT:
+		return domain.OrderByAmount
+	case proto.OrderBy_ORDER_BY_QUANTITY:
+		return domain.OrderByQuantity
+	case proto.OrderBy_ORDER_BY_UNSPECIFIED:
+		return ""
+	default:
+		return ""
 	}
-
-	switch request.GetAmount().(type) {
-	case *proto.CreateOrderRequest_Quantity:
-		entity.Quantity = new(utils.DecimalFromProto(request.GetQuantity()))
-		entity.OrderBy = domain.OrderByQuantity
-	case *proto.CreateOrderRequest_MonetaryValue:
-		entity.Amount = new(utils.MoneyToDecimal(request.GetMonetaryValue()))
-		entity.OrderBy = domain.OrderByAmount
-	}
-
-	return entity
 }
 
-func orderSideFromProto(side proto.OrderSide) domain.OrderSide {
+func OrderSideFromProto(side proto.OrderSide) domain.OrderSide {
 	switch side {
 	case proto.OrderSide_ORDER_SIDE_BUY:
 		return domain.OrderSideBuy
@@ -101,13 +81,13 @@ func OrderToProto(entity *domain.Order) *proto.Order {
 	}
 
 	if entity.Quantity != nil {
-		proto.Quantity = utils.DecimalToProto(*entity.Quantity)
+		proto.Quantity = util.DecimalToProto(*entity.Quantity)
 	}
 	if entity.Amount != nil {
-		proto.Amount = utils.DecimalToMoney(*entity.Amount)
+		proto.Amount = util.DecimalToMoney(*entity.Amount)
 	}
 	if entity.Price != nil {
-		proto.Price = utils.DecimalToMoney(*entity.Price)
+		proto.Price = util.DecimalToMoney(*entity.Price)
 	}
 
 	return proto

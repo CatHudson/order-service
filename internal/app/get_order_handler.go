@@ -5,7 +5,7 @@ import (
 	"errors"
 
 	"github.com/cathudson/order-service/internal/domain"
-	"github.com/cathudson/order-service/internal/mappers"
+	"github.com/cathudson/order-service/internal/mapper"
 	"github.com/cathudson/order-service/internal/proto"
 	"github.com/cathudson/order-service/internal/store"
 	"github.com/google/uuid"
@@ -35,7 +35,7 @@ func (h *getOrderHandler) handle(ctx context.Context, request *proto.GetOrderReq
 		return nil, status.Errorf(codes.Internal, "store error: %v", err)
 	}
 
-	return &proto.GetOrderResponse{Order: mappers.OrderToProto(entity)}, nil
+	return &proto.GetOrderResponse{Order: mapper.OrderToProto(entity)}, nil
 }
 
 func (h *getOrderHandler) validate(request *proto.GetOrderRequest) error {
