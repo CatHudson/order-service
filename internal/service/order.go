@@ -7,6 +7,7 @@ import (
 	"github.com/cathudson/order-service/internal/domain"
 	"github.com/cathudson/order-service/internal/mapper"
 	"github.com/cathudson/order-service/internal/store"
+	"github.com/google/uuid"
 )
 
 type OrderService struct {
@@ -35,4 +36,8 @@ func (s *OrderService) CreateOrder(ctx context.Context, order *domain.Order) err
 
 		return nil
 	})
+}
+
+func (s *OrderService) UpdateStatus(ctx context.Context, id uuid.UUID, status domain.OrderStatus) error {
+	return s.orderStore.UpdateStatus(ctx, id, status)
 }

@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"time"
 
 	"github.com/cathudson/order-service/internal/domain"
 	"github.com/google/uuid"
@@ -16,6 +17,7 @@ import (
 
 type OrderStore interface {
 	Create(ctx context.Context, order *domain.Order) error
+	UpdateStatus(ctx context.Context, id uuid.UUID, status domain.OrderStatus) error
 	GetByID(ctx context.Context, id uuid.UUID) (*domain.Order, error)
 	GetAllByStatus(ctx context.Context, status domain.OrderStatus) ([]*domain.Order, error)
 }
@@ -63,6 +65,25 @@ func (s *orderStore) Create(ctx context.Context, order *domain.Order) error {
 			return fmt.Errorf("%w: %w", domain.ErrOrderAlreadyExists, err)
 		}
 		return err
+	}
+
+	return nil
+}
+
+func (s *orderStore) UpdateStatus(ctx context.Context, id uuid.UUID, status domain.OrderStatus) error {
+	const query = `UPDATE orders SET status = $1, updated_at = $2 WHERE id = $3`
+
+	result, err := s.conn.Primary(ctx).ExecContext(ctx, query, status, time.Now(), id)
+	if err != nil {
+		return fmt.Errorf("update order status: %w", err)
+	}
+
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return fmt.Errorf("get rows affected: %w", err)
+	}
+	if rowsAffected == 0 {
+		return domain.ErrOrderNotFound
 	}
 
 	return nil
