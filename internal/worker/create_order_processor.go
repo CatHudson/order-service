@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"math/rand/v2"
 	"time"
 
 	"github.com/cathudson/order-service/internal/domain"
@@ -33,13 +34,36 @@ func (p *CreateOrderProcessor) ProcessTask(ctx context.Context, t *asynq.Task) e
 
 	order := orderFromTask(&entity)
 	err := p.orderService.CreateOrder(ctx, order)
-	if err != nil {
-		if errors.Is(err, domain.ErrOrderAlreadyExists) {
-			return nil
-		}
+	if err != nil && !errors.Is(err, domain.ErrOrderAlreadyExists) {
 		return fmt.Errorf("create order: %w", err)
 	}
+
+	status, delay := simulateProcessing()
+	time.Sleep(delay)
+	err = p.orderService.UpdateStatus(ctx, order.ID, status)
+	if err != nil {
+		return fmt.Errorf("update order status: %w", err)
+	}
+
 	return nil
+}
+
+//nolint:gosec,mnd // enough here
+func simulateProcessing() (domain.OrderStatus, time.Duration) {
+	const minDelay = 100 * time.Millisecond
+	const maxDelay = 3 * time.Second
+	delay := minDelay + time.Duration(rand.Int64N(int64(maxDelay-minDelay)))
+
+	r := rand.IntN(10)
+	status := domain.OrderStatusSuccess
+	switch {
+	case r < 2:
+		status = domain.OrderStatusFailed
+	case r == 3:
+		status = domain.OrderStatusCanceled
+	}
+
+	return status, delay
 }
 
 func orderFromTask(t *task.CreateOrderTask) *domain.Order {
