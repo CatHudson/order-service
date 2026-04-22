@@ -19,7 +19,10 @@ func MoneyToDecimal(m *money.Money) sdecimal.Decimal {
 }
 
 // DecimalToMoney converts a shopspring/decimal back to google.type.Money.
-func DecimalToMoney(d sdecimal.Decimal) *money.Money {
+func DecimalToMoney(d *sdecimal.Decimal) *money.Money {
+	if d == nil {
+		return nil
+	}
 	units := d.IntPart()
 	nanos := d.Sub(sdecimal.NewFromInt(units)).
 		Mul(sdecimal.NewFromInt(nanosPerUnit)).
@@ -42,7 +45,10 @@ func DecimalFromProto(d *gdecimal.Decimal) sdecimal.Decimal {
 }
 
 // DecimalToProto converts shopspring/decimal to google.type.Decimal.
-func DecimalToProto(d sdecimal.Decimal) *gdecimal.Decimal {
+func DecimalToProto(d *sdecimal.Decimal) *gdecimal.Decimal {
+	if d == nil {
+		return nil
+	}
 	return &gdecimal.Decimal{
 		Value: d.String(),
 	}

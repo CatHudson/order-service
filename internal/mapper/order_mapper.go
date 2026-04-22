@@ -66,34 +66,34 @@ func OrderSideFromProto(side proto.OrderSide) domain.OrderSide {
 */
 
 func OrderToProto(entity *domain.Order) *proto.Order {
-	proto := &proto.Order{
+	fixture := &proto.Order{
 		Id:             uuidToProto(entity.ID),
 		AccountId:      uuidToProto(entity.AccountID),
 		IdempotencyKey: uuidToProto(entity.IdempotencyKey),
 		InstrumentId:   uuidToProto(entity.InstrumentID),
-		OrderBy:        orderByToProto(entity.OrderBy),
+		OrderBy:        OrderByToProto(entity.OrderBy),
 		Quantity:       nil,
 		Amount:         nil,
 		Price:          nil,
-		Side:           orderSideToProto(entity.Side),
+		Side:           OrderSideToProto(entity.Side),
 		Status:         OrderStatusToProto(entity.Status),
 		ErrorMessage:   entity.ErrorMessage,
 	}
 
 	if entity.Quantity != nil {
-		proto.Quantity = util.DecimalToProto(*entity.Quantity)
+		fixture.Quantity = util.DecimalToProto(entity.Quantity)
 	}
 	if entity.Amount != nil {
-		proto.Amount = util.DecimalToMoney(*entity.Amount)
+		fixture.Amount = util.DecimalToMoney(entity.Amount)
 	}
 	if entity.Price != nil {
-		proto.Price = util.DecimalToMoney(*entity.Price)
+		fixture.Price = util.DecimalToMoney(entity.Price)
 	}
 
-	return proto
+	return fixture
 }
 
-func orderByToProto(orderBy domain.OrderBy) proto.OrderBy {
+func OrderByToProto(orderBy domain.OrderBy) proto.OrderBy {
 	switch orderBy {
 	case domain.OrderByQuantity:
 		return proto.OrderBy_ORDER_BY_QUANTITY
@@ -104,7 +104,7 @@ func orderByToProto(orderBy domain.OrderBy) proto.OrderBy {
 	}
 }
 
-func orderSideToProto(entity domain.OrderSide) proto.OrderSide {
+func OrderSideToProto(entity domain.OrderSide) proto.OrderSide {
 	switch entity {
 	case domain.OrderSideBuy:
 		return proto.OrderSide_ORDER_SIDE_BUY

@@ -11,6 +11,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/jmoiron/sqlx"
+	"github.com/shopspring/decimal"
 )
 
 //go:generate moq -rm -out gen/order_repository_mock.go -pkg storegen . OrderStore
@@ -18,6 +19,7 @@ import (
 type OrderStore interface {
 	Create(ctx context.Context, order *domain.Order) error
 	UpdateStatus(ctx context.Context, id uuid.UUID, status domain.OrderStatus) error
+	UpdateProcessingResult(ctx context.Context, id uuid.UUID, price, amount, quantity *decimal.Decimal, status domain.OrderStatus) error
 	GetByID(ctx context.Context, id uuid.UUID) (*domain.Order, error)
 	GetAllByStatus(ctx context.Context, status domain.OrderStatus) ([]*domain.Order, error)
 }
@@ -71,19 +73,32 @@ func (s *orderStore) Create(ctx context.Context, order *domain.Order) error {
 }
 
 func (s *orderStore) UpdateStatus(ctx context.Context, id uuid.UUID, status domain.OrderStatus) error {
-	const query = `UPDATE orders SET status = $1, updated_at = $2 WHERE id = $3`
+	const query = `
+		UPDATE orders 
+		SET status = $1, updated_at = $2 
+		WHERE id = $3 
+		AND updated_at <= $2 
+		AND status NOT IN ('SUCCESS', 'FAILED', 'CANCELED')`
 
-	result, err := s.conn.Primary(ctx).ExecContext(ctx, query, status, time.Now(), id)
+	_, err := s.conn.Primary(ctx).ExecContext(ctx, query, status, time.Now(), id)
 	if err != nil {
 		return fmt.Errorf("update order status: %w", err)
 	}
 
-	rowsAffected, err := result.RowsAffected()
+	return nil
+}
+
+func (s *orderStore) UpdateProcessingResult(ctx context.Context, id uuid.UUID, price, amount, quantity *decimal.Decimal, status domain.OrderStatus) error {
+	const query = `
+		UPDATE orders 
+		SET price = $1, amount = $2, quantity = $3, status = $4, updated_at = $5 
+		WHERE id = $6
+			AND updated_at <= $5 
+			AND status NOT IN ('SUCCESS', 'FAILED', 'CANCELED')`
+
+	_, err := s.conn.Primary(ctx).ExecContext(ctx, query, price, amount, quantity, status, time.Now(), id)
 	if err != nil {
-		return fmt.Errorf("get rows affected: %w", err)
-	}
-	if rowsAffected == 0 {
-		return domain.ErrOrderNotFound
+		return fmt.Errorf("update order data: %w", err)
 	}
 
 	return nil

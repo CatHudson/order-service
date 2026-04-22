@@ -8,6 +8,7 @@ import (
 	"github.com/cathudson/order-service/internal/mapper"
 	"github.com/cathudson/order-service/internal/store"
 	"github.com/google/uuid"
+	"github.com/shopspring/decimal"
 )
 
 type OrderService struct {
@@ -40,4 +41,8 @@ func (s *OrderService) CreateOrder(ctx context.Context, order *domain.Order) err
 
 func (s *OrderService) UpdateStatus(ctx context.Context, id uuid.UUID, status domain.OrderStatus) error {
 	return s.orderStore.UpdateStatus(ctx, id, status)
+}
+
+func (s *OrderService) UpdateProcessingResult(ctx context.Context, id uuid.UUID, price, amount, quantity *decimal.Decimal, status domain.OrderStatus) error {
+	return s.orderStore.UpdateProcessingResult(ctx, id, price, amount, quantity, status)
 }

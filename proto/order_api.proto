@@ -26,8 +26,7 @@ message CreateOrderRequest {
 }
 
 message CreateOrderResponse {
-  UUID id = 1;
-  OrderStatus status = 2;
+  Order order = 1;
 }
 
 message GetOrderRequest {

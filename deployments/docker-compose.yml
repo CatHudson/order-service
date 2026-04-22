@@ -7,6 +7,7 @@ services:
       POSTGRES_DB: orders
       POSTGRES_USER: orders_user
       POSTGRES_PASSWORD: orders_pass
+      PGDATA: /var/lib/postgresql/data/pgdata
     ports:
       - "5432:5432"
     volumes:
@@ -23,7 +24,7 @@ services:
     image: postgres:18-alpine
     environment:
       PGPASSWORD: replicator_pass
-      PGDATA: /var/lib/postgresql/data
+      PGDATA: /var/lib/postgresql/data/pgdata
     ports:
       - "5433:5432"
     volumes:
@@ -40,8 +41,17 @@ services:
     volumes:
       - redisdata:/data
 
+  kafka-volume-init:
+    image: busybox
+    volumes:
+      - kafkadata:/data
+    command: chown -R 1000:1000 /data
+
   kafka:
     image: apache/kafka:3.9.0
+    depends_on:
+      kafka-volume-init:
+        condition: service_completed_successfully
     ports:
       - "9092:9092"
     environment:
@@ -79,6 +89,13 @@ services:
           --partitions 3 \
           --replication-factor 1 \
           --bootstrap-server kafka:9093
+        
+        /opt/kafka/bin/kafka-topics.sh --create --if-not-exists \
+          --topic order-result \
+          --partitions 3 \
+          --replication-factor 1 \
+          --bootstrap-server kafka:9093
+        
         echo "Topics created."
 
 volumes:

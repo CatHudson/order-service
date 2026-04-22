@@ -8,6 +8,7 @@ import (
 	"github.com/cathudson/order-service/internal/domain"
 	"github.com/cathudson/order-service/internal/store"
 	"github.com/google/uuid"
+	"github.com/shopspring/decimal"
 	"sync"
 )
 
@@ -30,6 +31,9 @@ var _ store.OrderStore = &OrderStoreMock{}
 //			GetByIDFunc: func(ctx context.Context, id uuid.UUID) (*domain.Order, error) {
 //				panic("mock out the GetByID method")
 //			},
+//			UpdateProcessingResultFunc: func(ctx context.Context, id uuid.UUID, price *decimal.Decimal, amount *decimal.Decimal, quantity *decimal.Decimal, status domain.OrderStatus) error {
+//				panic("mock out the UpdateProcessingResult method")
+//			},
 //			UpdateStatusFunc: func(ctx context.Context, id uuid.UUID, status domain.OrderStatus) error {
 //				panic("mock out the UpdateStatus method")
 //			},
@@ -48,6 +52,9 @@ type OrderStoreMock struct {
 
 	// GetByIDFunc mocks the GetByID method.
 	GetByIDFunc func(ctx context.Context, id uuid.UUID) (*domain.Order, error)
+
+	// UpdateProcessingResultFunc mocks the UpdateProcessingResult method.
+	UpdateProcessingResultFunc func(ctx context.Context, id uuid.UUID, price *decimal.Decimal, amount *decimal.Decimal, quantity *decimal.Decimal, status domain.OrderStatus) error
 
 	// UpdateStatusFunc mocks the UpdateStatus method.
 	UpdateStatusFunc func(ctx context.Context, id uuid.UUID, status domain.OrderStatus) error
@@ -75,6 +82,21 @@ type OrderStoreMock struct {
 			// ID is the id argument value.
 			ID uuid.UUID
 		}
+		// UpdateProcessingResult holds details about calls to the UpdateProcessingResult method.
+		UpdateProcessingResult []struct {
+			// Ctx is the ctx argument value.
+			Ctx context.Context
+			// ID is the id argument value.
+			ID uuid.UUID
+			// Price is the price argument value.
+			Price *decimal.Decimal
+			// Amount is the amount argument value.
+			Amount *decimal.Decimal
+			// Quantity is the quantity argument value.
+			Quantity *decimal.Decimal
+			// Status is the status argument value.
+			Status domain.OrderStatus
+		}
 		// UpdateStatus holds details about calls to the UpdateStatus method.
 		UpdateStatus []struct {
 			// Ctx is the ctx argument value.
@@ -85,10 +107,11 @@ type OrderStoreMock struct {
 			Status domain.OrderStatus
 		}
 	}
-	lockCreate         sync.RWMutex
-	lockGetAllByStatus sync.RWMutex
-	lockGetByID        sync.RWMutex
-	lockUpdateStatus   sync.RWMutex
+	lockCreate                 sync.RWMutex
+	lockGetAllByStatus         sync.RWMutex
+	lockGetByID                sync.RWMutex
+	lockUpdateProcessingResult sync.RWMutex
+	lockUpdateStatus           sync.RWMutex
 }
 
 // Create calls CreateFunc.
@@ -196,6 +219,58 @@ func (mock *OrderStoreMock) GetByIDCalls() []struct {
 	mock.lockGetByID.RLock()
 	calls = mock.calls.GetByID
 	mock.lockGetByID.RUnlock()
+	return calls
+}
+
+// UpdateProcessingResult calls UpdateProcessingResultFunc.
+func (mock *OrderStoreMock) UpdateProcessingResult(ctx context.Context, id uuid.UUID, price *decimal.Decimal, amount *decimal.Decimal, quantity *decimal.Decimal, status domain.OrderStatus) error {
+	if mock.UpdateProcessingResultFunc == nil {
+		panic("OrderStoreMock.UpdateProcessingResultFunc: method is nil but OrderStore.UpdateProcessingResult was just called")
+	}
+	callInfo := struct {
+		Ctx      context.Context
+		ID       uuid.UUID
+		Price    *decimal.Decimal
+		Amount   *decimal.Decimal
+		Quantity *decimal.Decimal
+		Status   domain.OrderStatus
+	}{
+		Ctx:      ctx,
+		ID:       id,
+		Price:    price,
+		Amount:   amount,
+		Quantity: quantity,
+		Status:   status,
+	}
+	mock.lockUpdateProcessingResult.Lock()
+	mock.calls.UpdateProcessingResult = append(mock.calls.UpdateProcessingResult, callInfo)
+	mock.lockUpdateProcessingResult.Unlock()
+	return mock.UpdateProcessingResultFunc(ctx, id, price, amount, quantity, status)
+}
+
+// UpdateProcessingResultCalls gets all the calls that were made to UpdateProcessingResult.
+// Check the length with:
+//
+//	len(mockedOrderStore.UpdateProcessingResultCalls())
+func (mock *OrderStoreMock) UpdateProcessingResultCalls() []struct {
+	Ctx      context.Context
+	ID       uuid.UUID
+	Price    *decimal.Decimal
+	Amount   *decimal.Decimal
+	Quantity *decimal.Decimal
+	Status   domain.OrderStatus
+} {
+	var calls []struct {
+		Ctx      context.Context
+		ID       uuid.UUID
+		Price    *decimal.Decimal
+		Amount   *decimal.Decimal
+		Quantity *decimal.Decimal
+		Status   domain.OrderStatus
+	}
+	mock.lockUpdateProcessingResult.RLock()
+	calls = mock.calls.UpdateProcessingResult
+	mock.lockUpdateProcessingResult.RUnlock()
 	return calls
 }
 
