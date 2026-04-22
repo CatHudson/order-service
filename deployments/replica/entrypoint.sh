@@ -1,24 +1,24 @@
 #!/bin/bash
 set -e
 
-# Wait for primary to be ready
+PGDATA=/var/lib/postgresql/data/pgdata
+
 echo "Replica: waiting for primary..."
 until pg_isready -h postgres-primary -U replicator -d orders; do
     sleep 1
 done
 
-# If data directory is empty, clone from primary
-if [ -z "$(ls -A /var/lib/postgresql/data)" ]; then
+if [ -z "$(ls -A $PGDATA 2>/dev/null)" ]; then
     echo "Replica: cloning from primary..."
-    chown postgres:postgres /var/lib/postgresql/data
-    chmod 700 /var/lib/postgresql/data
+    mkdir -p "$PGDATA"
+    chown postgres:postgres "$PGDATA"
+    chmod 700 "$PGDATA"
     gosu postgres pg_basebackup \
         -h postgres-primary \
         -U replicator \
-        -D /var/lib/postgresql/data \
+        -D "$PGDATA" \
         -Fp -Xs -P -R
     echo "Replica: base backup complete."
 fi
 
-# Start Postgres as the postgres user
 exec gosu postgres postgres
