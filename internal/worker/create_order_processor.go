@@ -9,13 +9,19 @@ import (
 	"time"
 
 	"github.com/cathudson/order-service/internal/domain"
+	"github.com/cathudson/order-service/internal/mapper"
+	"github.com/cathudson/order-service/internal/producer"
+	"github.com/cathudson/order-service/internal/proto"
 	"github.com/cathudson/order-service/internal/service"
 	"github.com/cathudson/order-service/internal/task"
+	"github.com/cathudson/order-service/internal/util"
 	"github.com/hibiken/asynq"
+	"github.com/shopspring/decimal"
 )
 
 type CreateOrderProcessor struct {
-	orderService *service.OrderService
+	orderService        *service.OrderService
+	orderResultProducer producer.OrderResultProducer
 }
 
 func NewCreateOrderProcessor(orderService *service.OrderService) *CreateOrderProcessor {
@@ -38,18 +44,25 @@ func (p *CreateOrderProcessor) ProcessTask(ctx context.Context, t *asynq.Task) e
 		return fmt.Errorf("create order: %w", err)
 	}
 
-	status, delay := simulateProcessing()
-	time.Sleep(delay)
-	err = p.orderService.UpdateStatus(ctx, order.ID, status)
+	err = p.process(ctx, order)
 	if err != nil {
-		return fmt.Errorf("update order status: %w", err)
+		return fmt.Errorf("process order: %w", err)
 	}
 
 	return nil
 }
 
 //nolint:gosec,mnd // enough here
-func simulateProcessing() (domain.OrderStatus, time.Duration) {
+func (p *CreateOrderProcessor) process(ctx context.Context, order *domain.Order) error {
+	if err := p.orderService.UpdateStatus(ctx, order.ID, domain.OrderStatusPending); err != nil {
+		return fmt.Errorf("process order switch to pending: %w", err)
+	}
+
+	priceInt := rand.IntN(1000) + 1
+	priceF := float64(priceInt) + rand.Float64()
+	price := new(decimal.RequireFromString(fmt.Sprintf("%.5f", priceF)))
+	order.Price = price
+
 	const minDelay = 100 * time.Millisecond
 	const maxDelay = 3 * time.Second
 	delay := minDelay + time.Duration(rand.Int64N(int64(maxDelay-minDelay)))
@@ -62,8 +75,60 @@ func simulateProcessing() (domain.OrderStatus, time.Duration) {
 	case r == 3:
 		status = domain.OrderStatusCanceled
 	}
+	order.Status = status
 
-	return status, delay
+	time.Sleep(delay)
+
+	if status != domain.OrderStatusSuccess {
+		orderResult := &proto.OrderResultEvent{
+			Id:           &proto.UUID{Value: order.ID.String()},
+			Side:         mapper.OrderSideToProto(order.Side),
+			OrderBy:      mapper.OrderByToProto(order.OrderBy),
+			Status:       mapper.OrderStatusToProto(order.Status),
+			Price:        nil,
+			Amount:       util.DecimalToProto(order.Amount),
+			Quantity:     util.DecimalToProto(order.Quantity),
+			ErrorMessage: new("order failed due to processing error"),
+		}
+		if err := p.orderResultProducer.Produce(ctx, orderResult); err != nil {
+			return fmt.Errorf("produce order result: %w", err)
+		}
+		if err := p.orderService.UpdateStatus(ctx, order.ID, order.Status); err != nil {
+			return fmt.Errorf("process order terminal status: %w", err)
+		}
+		return nil
+	}
+
+	switch order.OrderBy {
+	case domain.OrderByAmount:
+		qty := new(order.Amount.Div(*price))
+		order.Quantity = qty
+		if err := p.orderService.UpdateProcessingResult(ctx, order.ID, price, order.Amount, order.Quantity, order.Status); err != nil {
+			return fmt.Errorf("process order update processing result: %w", err)
+		}
+	case domain.OrderByQuantity:
+		amount := new(order.Quantity.Mul(*price))
+		order.Amount = amount
+		if err := p.orderService.UpdateProcessingResult(ctx, order.ID, price, order.Amount, order.Quantity, order.Status); err != nil {
+			return fmt.Errorf("process order update processing result: %w", err)
+		}
+	}
+
+	orderResult := &proto.OrderResultEvent{
+		Id:           &proto.UUID{Value: order.ID.String()},
+		Side:         mapper.OrderSideToProto(order.Side),
+		OrderBy:      mapper.OrderByToProto(order.OrderBy),
+		Status:       mapper.OrderStatusToProto(order.Status),
+		Price:        util.DecimalToProto(order.Price),
+		Amount:       util.DecimalToProto(order.Amount),
+		Quantity:     util.DecimalToProto(order.Quantity),
+		ErrorMessage: nil,
+	}
+	if err := p.orderResultProducer.Produce(ctx, orderResult); err != nil {
+		return fmt.Errorf("produce order result: %w", err)
+	}
+
+	return nil
 }
 
 func orderFromTask(t *task.CreateOrderTask) *domain.Order {

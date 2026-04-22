@@ -118,6 +118,7 @@ func run() error {
 
 	// kafka
 	createOrderProducer := producer.NewCreateOrderProducer(cfg.Kafka)
+	orderResultProducer := producer.NewOrderResultProducer(cfg.Kafka)
 	createOrderConsumer := consumer.NewCreateOrderConsumer(asynqClient, logger)
 	createOrderReader := kafka.NewReader(kafka.ReaderConfig{
 		Brokers: []string{cfg.Kafka.Address},
@@ -152,6 +153,9 @@ func run() error {
 			logger.Errorf("failed to close consumer: %v", err)
 		}
 		if err = createOrderProducer.Close(); err != nil {
+			logger.Errorf("failed to close producer: %v", err)
+		}
+		if err = orderResultProducer.Close(); err != nil {
 			logger.Errorf("failed to close producer: %v", err)
 		}
 	}()

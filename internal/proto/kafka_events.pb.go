@@ -123,6 +123,106 @@ func (x *CreateOrderEvent) GetSide() OrderSide {
 	return OrderSide_ORDER_SIDE_UNSPECIFIED
 }
 
+type OrderResultEvent struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            *UUID                  `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Side          OrderSide              `protobuf:"varint,2,opt,name=side,proto3,enum=order.v1.OrderSide" json:"side,omitempty"`
+	OrderBy       OrderBy                `protobuf:"varint,3,opt,name=order_by,json=orderBy,proto3,enum=order.v1.OrderBy" json:"order_by,omitempty"`
+	Status        OrderStatus            `protobuf:"varint,4,opt,name=status,proto3,enum=order.v1.OrderStatus" json:"status,omitempty"`
+	Price         *decimal.Decimal       `protobuf:"bytes,5,opt,name=price,proto3,oneof" json:"price,omitempty"`
+	Amount        *decimal.Decimal       `protobuf:"bytes,6,opt,name=amount,proto3,oneof" json:"amount,omitempty"`
+	Quantity      *decimal.Decimal       `protobuf:"bytes,7,opt,name=quantity,proto3,oneof" json:"quantity,omitempty"`
+	ErrorMessage  *string                `protobuf:"bytes,8,opt,name=error_message,json=errorMessage,proto3,oneof" json:"error_message,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *OrderResultEvent) Reset() {
+	*x = OrderResultEvent{}
+	mi := &file_kafka_events_proto_msgTypes[1]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *OrderResultEvent) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*OrderResultEvent) ProtoMessage() {}
+
+func (x *OrderResultEvent) ProtoReflect() protoreflect.Message {
+	mi := &file_kafka_events_proto_msgTypes[1]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use OrderResultEvent.ProtoReflect.Descriptor instead.
+func (*OrderResultEvent) Descriptor() ([]byte, []int) {
+	return file_kafka_events_proto_rawDescGZIP(), []int{1}
+}
+
+func (x *OrderResultEvent) GetId() *UUID {
+	if x != nil {
+		return x.Id
+	}
+	return nil
+}
+
+func (x *OrderResultEvent) GetSide() OrderSide {
+	if x != nil {
+		return x.Side
+	}
+	return OrderSide_ORDER_SIDE_UNSPECIFIED
+}
+
+func (x *OrderResultEvent) GetOrderBy() OrderBy {
+	if x != nil {
+		return x.OrderBy
+	}
+	return OrderBy_ORDER_BY_UNSPECIFIED
+}
+
+func (x *OrderResultEvent) GetStatus() OrderStatus {
+	if x != nil {
+		return x.Status
+	}
+	return OrderStatus_ORDER_STATUS_UNSPECIFIED
+}
+
+func (x *OrderResultEvent) GetPrice() *decimal.Decimal {
+	if x != nil {
+		return x.Price
+	}
+	return nil
+}
+
+func (x *OrderResultEvent) GetAmount() *decimal.Decimal {
+	if x != nil {
+		return x.Amount
+	}
+	return nil
+}
+
+func (x *OrderResultEvent) GetQuantity() *decimal.Decimal {
+	if x != nil {
+		return x.Quantity
+	}
+	return nil
+}
+
+func (x *OrderResultEvent) GetErrorMessage() string {
+	if x != nil && x.ErrorMessage != nil {
+		return *x.ErrorMessage
+	}
+	return ""
+}
+
 var File_kafka_events_proto protoreflect.FileDescriptor
 
 const file_kafka_events_proto_rawDesc = "" +
@@ -139,7 +239,20 @@ const file_kafka_events_proto_rawDesc = "" +
 	"\x06amount\x18\a \x01(\v2\x12.google.type.MoneyH\x01R\x06amount\x88\x01\x01\x12'\n" +
 	"\x04side\x18\b \x01(\x0e2\x13.order.v1.OrderSideR\x04sideB\v\n" +
 	"\t_quantityB\t\n" +
-	"\a_amountB3Z1github.com/cathudson/order-service/internal/protob\x06proto3"
+	"\a_amount\"\xb1\x03\n" +
+	"\x10OrderResultEvent\x12\x1e\n" +
+	"\x02id\x18\x01 \x01(\v2\x0e.order.v1.UUIDR\x02id\x12'\n" +
+	"\x04side\x18\x02 \x01(\x0e2\x13.order.v1.OrderSideR\x04side\x12,\n" +
+	"\border_by\x18\x03 \x01(\x0e2\x11.order.v1.OrderByR\aorderBy\x12-\n" +
+	"\x06status\x18\x04 \x01(\x0e2\x15.order.v1.OrderStatusR\x06status\x12/\n" +
+	"\x05price\x18\x05 \x01(\v2\x14.google.type.DecimalH\x00R\x05price\x88\x01\x01\x121\n" +
+	"\x06amount\x18\x06 \x01(\v2\x14.google.type.DecimalH\x01R\x06amount\x88\x01\x01\x125\n" +
+	"\bquantity\x18\a \x01(\v2\x14.google.type.DecimalH\x02R\bquantity\x88\x01\x01\x12(\n" +
+	"\rerror_message\x18\b \x01(\tH\x03R\ferrorMessage\x88\x01\x01B\b\n" +
+	"\x06_priceB\t\n" +
+	"\a_amountB\v\n" +
+	"\t_quantityB\x10\n" +
+	"\x0e_error_messageB3Z1github.com/cathudson/order-service/internal/protob\x06proto3"
 
 var (
 	file_kafka_events_proto_rawDescOnce sync.Once
@@ -153,29 +266,38 @@ func file_kafka_events_proto_rawDescGZIP() []byte {
 	return file_kafka_events_proto_rawDescData
 }
 
-var file_kafka_events_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
+var file_kafka_events_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
 var file_kafka_events_proto_goTypes = []any{
 	(*CreateOrderEvent)(nil), // 0: order.v1.CreateOrderEvent
-	(*UUID)(nil),             // 1: order.v1.UUID
-	(OrderBy)(0),             // 2: order.v1.OrderBy
-	(*decimal.Decimal)(nil),  // 3: google.type.Decimal
-	(*money.Money)(nil),      // 4: google.type.Money
-	(OrderSide)(0),           // 5: order.v1.OrderSide
+	(*OrderResultEvent)(nil), // 1: order.v1.OrderResultEvent
+	(*UUID)(nil),             // 2: order.v1.UUID
+	(OrderBy)(0),             // 3: order.v1.OrderBy
+	(*decimal.Decimal)(nil),  // 4: google.type.Decimal
+	(*money.Money)(nil),      // 5: google.type.Money
+	(OrderSide)(0),           // 6: order.v1.OrderSide
+	(OrderStatus)(0),         // 7: order.v1.OrderStatus
 }
 var file_kafka_events_proto_depIdxs = []int32{
-	1, // 0: order.v1.CreateOrderEvent.id:type_name -> order.v1.UUID
-	1, // 1: order.v1.CreateOrderEvent.account_id:type_name -> order.v1.UUID
-	1, // 2: order.v1.CreateOrderEvent.idempotency_key:type_name -> order.v1.UUID
-	1, // 3: order.v1.CreateOrderEvent.instrument_id:type_name -> order.v1.UUID
-	2, // 4: order.v1.CreateOrderEvent.order_by:type_name -> order.v1.OrderBy
-	3, // 5: order.v1.CreateOrderEvent.quantity:type_name -> google.type.Decimal
-	4, // 6: order.v1.CreateOrderEvent.amount:type_name -> google.type.Money
-	5, // 7: order.v1.CreateOrderEvent.side:type_name -> order.v1.OrderSide
-	8, // [8:8] is the sub-list for method output_type
-	8, // [8:8] is the sub-list for method input_type
-	8, // [8:8] is the sub-list for extension type_name
-	8, // [8:8] is the sub-list for extension extendee
-	0, // [0:8] is the sub-list for field type_name
+	2,  // 0: order.v1.CreateOrderEvent.id:type_name -> order.v1.UUID
+	2,  // 1: order.v1.CreateOrderEvent.account_id:type_name -> order.v1.UUID
+	2,  // 2: order.v1.CreateOrderEvent.idempotency_key:type_name -> order.v1.UUID
+	2,  // 3: order.v1.CreateOrderEvent.instrument_id:type_name -> order.v1.UUID
+	3,  // 4: order.v1.CreateOrderEvent.order_by:type_name -> order.v1.OrderBy
+	4,  // 5: order.v1.CreateOrderEvent.quantity:type_name -> google.type.Decimal
+	5,  // 6: order.v1.CreateOrderEvent.amount:type_name -> google.type.Money
+	6,  // 7: order.v1.CreateOrderEvent.side:type_name -> order.v1.OrderSide
+	2,  // 8: order.v1.OrderResultEvent.id:type_name -> order.v1.UUID
+	6,  // 9: order.v1.OrderResultEvent.side:type_name -> order.v1.OrderSide
+	3,  // 10: order.v1.OrderResultEvent.order_by:type_name -> order.v1.OrderBy
+	7,  // 11: order.v1.OrderResultEvent.status:type_name -> order.v1.OrderStatus
+	4,  // 12: order.v1.OrderResultEvent.price:type_name -> google.type.Decimal
+	4,  // 13: order.v1.OrderResultEvent.amount:type_name -> google.type.Decimal
+	4,  // 14: order.v1.OrderResultEvent.quantity:type_name -> google.type.Decimal
+	15, // [15:15] is the sub-list for method output_type
+	15, // [15:15] is the sub-list for method input_type
+	15, // [15:15] is the sub-list for extension type_name
+	15, // [15:15] is the sub-list for extension extendee
+	0,  // [0:15] is the sub-list for field type_name
 }
 
 func init() { file_kafka_events_proto_init() }
@@ -186,13 +308,14 @@ func file_kafka_events_proto_init() {
 	file_types_proto_init()
 	file_order_proto_init()
 	file_kafka_events_proto_msgTypes[0].OneofWrappers = []any{}
+	file_kafka_events_proto_msgTypes[1].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_kafka_events_proto_rawDesc), len(file_kafka_events_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   1,
+			NumMessages:   2,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

@@ -38,6 +38,7 @@ kafka:
   address: localhost:9092
   producers:
     createOrderTopic: "create-order"
+    orderResultTopic: "order-result"
   consumers:
     createOrderTopic: "create-order"
     groupId: "order-service"

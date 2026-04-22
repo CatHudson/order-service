@@ -19,3 +19,14 @@ message CreateOrderEvent {
   optional google.type.Money amount = 7;
   OrderSide side = 8;
 }
+
+message OrderResultEvent {
+  UUID id = 1;
+  OrderSide side = 2;
+  OrderBy order_by = 3;
+  OrderStatus status = 4;
+  optional google.type.Decimal price = 5;
+  optional google.type.Decimal amount = 6;
+  optional google.type.Decimal quantity = 7;
+  optional string error_message = 8;
+}
