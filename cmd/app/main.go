@@ -23,6 +23,7 @@ import (
 	"github.com/cathudson/order-service/internal/worker"
 	"github.com/hibiken/asynq"
 	"github.com/jmoiron/sqlx"
+	"github.com/redis/go-redis/v9"
 	"github.com/segmentio/kafka-go"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
@@ -73,6 +74,10 @@ func run() error {
 	}
 	defer listener.Close()
 
+	// Redis
+	redisClient := redis.NewClient(&redis.Options{Addr: cfg.Redis.Addr})
+	defer redisClient.Close()
+
 	// DB stuff
 	var primary, replica *sqlx.DB
 	primary, err = db.NewPostgresDB(ctx, cfg.Postgres.Primary)
@@ -91,14 +96,19 @@ func run() error {
 	tx := store.NewTransactor(primary)
 
 	orderStore := store.NewOrderStore(connContainer)
+	orderResultStore := store.NewOrderResultStore(redisClient)
 	ordersAuditLogStore := store.NewOrdersAuditLogStore(connContainer)
 
 	// services
 	orderService := service.NewOrderService(tx, orderStore, ordersAuditLogStore)
 
+	// kafka producers
+	createOrderProducer := producer.NewCreateOrderProducer(cfg.Kafka)
+	orderResultProducer := producer.NewOrderResultProducer(cfg.Kafka)
+
 	// asynq
 	mux := asynq.NewServeMux()
-	createOrderProcessor := worker.NewCreateOrderProcessor(orderService)
+	createOrderProcessor := worker.NewCreateOrderProcessor(orderService, orderResultProducer)
 	createOrderProcessor.Register(mux)
 
 	asynqClient := task.NewAsynqClient(asynq.RedisClientOpt{Addr: cfg.Redis.Addr})
@@ -116,23 +126,30 @@ func run() error {
 	}
 	defer asynqServer.Stop()
 
-	// kafka
-	createOrderProducer := producer.NewCreateOrderProducer(cfg.Kafka)
-	orderResultProducer := producer.NewOrderResultProducer(cfg.Kafka)
+	// kafka consumers
 	createOrderConsumer := consumer.NewCreateOrderConsumer(asynqClient, logger)
 	createOrderReader := kafka.NewReader(kafka.ReaderConfig{
 		Brokers: []string{cfg.Kafka.Address},
 		Topic:   cfg.Kafka.Consumers.CreateOrderTopic,
 		GroupID: cfg.Kafka.Consumers.GroupID,
 	})
-	runner := consumer.NewRunner(createOrderReader, createOrderConsumer, func() *proto.CreateOrderEvent { return &proto.CreateOrderEvent{} }, logger)
-	go runner.Run(ctx)
+	createOrderRunner := consumer.NewRunner(createOrderReader, createOrderConsumer, func() *proto.CreateOrderEvent { return &proto.CreateOrderEvent{} }, logger)
+	go createOrderRunner.Run(ctx)
+
+	orderResultConsumer := consumer.NewOrderResultConsumer(orderResultStore)
+	orderResultReader := kafka.NewReader(kafka.ReaderConfig{
+		Brokers: []string{cfg.Kafka.Address},
+		Topic:   cfg.Kafka.Consumers.OrderResultTopic,
+		GroupID: cfg.Kafka.Consumers.GroupID,
+	})
+	orderResultRunner := consumer.NewRunner(orderResultReader, orderResultConsumer, func() *proto.OrderResultEvent { return &proto.OrderResultEvent{} }, logger)
+	go orderResultRunner.Run(ctx)
 
 	// goroutine reporter
 	go report.NewReporter(orderStore, logger).Run(ctx)
 
 	// app
-	app := grpcApp.New(createOrderProducer, orderStore)
+	app := grpcApp.New(createOrderProducer, orderStore, orderResultStore, logger)
 	server := grpc.NewServer(
 		grpc.UnaryInterceptor(interceptor.RequestIDInterceptor),
 	)
@@ -150,6 +167,9 @@ func run() error {
 		healthServer.Shutdown()
 		asynqServer.Shutdown()
 		if err = createOrderReader.Close(); err != nil {
+			logger.Errorf("failed to close consumer: %v", err)
+		}
+		if err = orderResultReader.Close(); err != nil {
 			logger.Errorf("failed to close consumer: %v", err)
 		}
 		if err = createOrderProducer.Close(); err != nil {

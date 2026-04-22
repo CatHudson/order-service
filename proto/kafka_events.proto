@@ -25,8 +25,8 @@ message OrderResultEvent {
   OrderSide side = 2;
   OrderBy order_by = 3;
   OrderStatus status = 4;
-  optional google.type.Decimal price = 5;
-  optional google.type.Decimal amount = 6;
+  optional google.type.Money price = 5;
+  optional google.type.Money amount = 6;
   optional google.type.Decimal quantity = 7;
   optional string error_message = 8;
 }

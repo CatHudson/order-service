@@ -139,8 +139,7 @@ func (*CreateOrderRequest_Quantity) isCreateOrderRequest_Amount() {}
 
 type CreateOrderResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            *UUID                  `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	Status        OrderStatus            `protobuf:"varint,2,opt,name=status,proto3,enum=order.v1.OrderStatus" json:"status,omitempty"`
+	Order         *Order                 `protobuf:"bytes,1,opt,name=order,proto3" json:"order,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -175,18 +174,11 @@ func (*CreateOrderResponse) Descriptor() ([]byte, []int) {
 	return file_order_api_proto_rawDescGZIP(), []int{1}
 }
 
-func (x *CreateOrderResponse) GetId() *UUID {
+func (x *CreateOrderResponse) GetOrder() *Order {
 	if x != nil {
-		return x.Id
+		return x.Order
 	}
 	return nil
-}
-
-func (x *CreateOrderResponse) GetStatus() OrderStatus {
-	if x != nil {
-		return x.Status
-	}
-	return OrderStatus_ORDER_STATUS_UNSPECIFIED
 }
 
 type GetOrderRequest struct {
@@ -290,10 +282,9 @@ const file_order_api_proto_rawDesc = "" +
 	"\x04side\x18\x04 \x01(\x0e2\x13.order.v1.OrderSideR\x04side\x12;\n" +
 	"\x0emonetary_value\x18\x05 \x01(\v2\x12.google.type.MoneyH\x00R\rmonetaryValue\x122\n" +
 	"\bquantity\x18\x06 \x01(\v2\x14.google.type.DecimalH\x00R\bquantityB\b\n" +
-	"\x06amount\"d\n" +
-	"\x13CreateOrderResponse\x12\x1e\n" +
-	"\x02id\x18\x01 \x01(\v2\x0e.order.v1.UUIDR\x02id\x12-\n" +
-	"\x06status\x18\x02 \x01(\x0e2\x15.order.v1.OrderStatusR\x06status\"1\n" +
+	"\x06amount\"<\n" +
+	"\x13CreateOrderResponse\x12%\n" +
+	"\x05order\x18\x01 \x01(\v2\x0f.order.v1.OrderR\x05order\"1\n" +
 	"\x0fGetOrderRequest\x12\x1e\n" +
 	"\x02id\x18\x01 \x01(\v2\x0e.order.v1.UUIDR\x02id\"9\n" +
 	"\x10GetOrderResponse\x12%\n" +
@@ -324,8 +315,7 @@ var file_order_api_proto_goTypes = []any{
 	(OrderSide)(0),              // 5: order.v1.OrderSide
 	(*money.Money)(nil),         // 6: google.type.Money
 	(*decimal.Decimal)(nil),     // 7: google.type.Decimal
-	(OrderStatus)(0),            // 8: order.v1.OrderStatus
-	(*Order)(nil),               // 9: order.v1.Order
+	(*Order)(nil),               // 8: order.v1.Order
 }
 var file_order_api_proto_depIdxs = []int32{
 	4,  // 0: order.v1.CreateOrderRequest.instrument_id:type_name -> order.v1.UUID
@@ -334,19 +324,18 @@ var file_order_api_proto_depIdxs = []int32{
 	5,  // 3: order.v1.CreateOrderRequest.side:type_name -> order.v1.OrderSide
 	6,  // 4: order.v1.CreateOrderRequest.monetary_value:type_name -> google.type.Money
 	7,  // 5: order.v1.CreateOrderRequest.quantity:type_name -> google.type.Decimal
-	4,  // 6: order.v1.CreateOrderResponse.id:type_name -> order.v1.UUID
-	8,  // 7: order.v1.CreateOrderResponse.status:type_name -> order.v1.OrderStatus
-	4,  // 8: order.v1.GetOrderRequest.id:type_name -> order.v1.UUID
-	9,  // 9: order.v1.GetOrderResponse.order:type_name -> order.v1.Order
-	0,  // 10: order.v1.OrderService.CreateOrder:input_type -> order.v1.CreateOrderRequest
-	2,  // 11: order.v1.OrderService.GetOrder:input_type -> order.v1.GetOrderRequest
-	1,  // 12: order.v1.OrderService.CreateOrder:output_type -> order.v1.CreateOrderResponse
-	3,  // 13: order.v1.OrderService.GetOrder:output_type -> order.v1.GetOrderResponse
-	12, // [12:14] is the sub-list for method output_type
-	10, // [10:12] is the sub-list for method input_type
-	10, // [10:10] is the sub-list for extension type_name
-	10, // [10:10] is the sub-list for extension extendee
-	0,  // [0:10] is the sub-list for field type_name
+	8,  // 6: order.v1.CreateOrderResponse.order:type_name -> order.v1.Order
+	4,  // 7: order.v1.GetOrderRequest.id:type_name -> order.v1.UUID
+	8,  // 8: order.v1.GetOrderResponse.order:type_name -> order.v1.Order
+	0,  // 9: order.v1.OrderService.CreateOrder:input_type -> order.v1.CreateOrderRequest
+	2,  // 10: order.v1.OrderService.GetOrder:input_type -> order.v1.GetOrderRequest
+	1,  // 11: order.v1.OrderService.CreateOrder:output_type -> order.v1.CreateOrderResponse
+	3,  // 12: order.v1.OrderService.GetOrder:output_type -> order.v1.GetOrderResponse
+	11, // [11:13] is the sub-list for method output_type
+	9,  // [9:11] is the sub-list for method input_type
+	9,  // [9:9] is the sub-list for extension type_name
+	9,  // [9:9] is the sub-list for extension extendee
+	0,  // [0:9] is the sub-list for field type_name
 }
 
 func init() { file_order_api_proto_init() }

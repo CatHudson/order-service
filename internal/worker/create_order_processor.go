@@ -24,8 +24,8 @@ type CreateOrderProcessor struct {
 	orderResultProducer producer.OrderResultProducer
 }
 
-func NewCreateOrderProcessor(orderService *service.OrderService) *CreateOrderProcessor {
-	return &CreateOrderProcessor{orderService: orderService}
+func NewCreateOrderProcessor(orderService *service.OrderService, orderResultProducer producer.OrderResultProducer) *CreateOrderProcessor {
+	return &CreateOrderProcessor{orderService: orderService, orderResultProducer: orderResultProducer}
 }
 
 func (p *CreateOrderProcessor) Register(mux *asynq.ServeMux) {
@@ -86,7 +86,7 @@ func (p *CreateOrderProcessor) process(ctx context.Context, order *domain.Order)
 			OrderBy:      mapper.OrderByToProto(order.OrderBy),
 			Status:       mapper.OrderStatusToProto(order.Status),
 			Price:        nil,
-			Amount:       util.DecimalToProto(order.Amount),
+			Amount:       util.DecimalToMoney(order.Amount),
 			Quantity:     util.DecimalToProto(order.Quantity),
 			ErrorMessage: new("order failed due to processing error"),
 		}
@@ -119,8 +119,8 @@ func (p *CreateOrderProcessor) process(ctx context.Context, order *domain.Order)
 		Side:         mapper.OrderSideToProto(order.Side),
 		OrderBy:      mapper.OrderByToProto(order.OrderBy),
 		Status:       mapper.OrderStatusToProto(order.Status),
-		Price:        util.DecimalToProto(order.Price),
-		Amount:       util.DecimalToProto(order.Amount),
+		Price:        util.DecimalToMoney(order.Price),
+		Amount:       util.DecimalToMoney(order.Amount),
 		Quantity:     util.DecimalToProto(order.Quantity),
 		ErrorMessage: nil,
 	}

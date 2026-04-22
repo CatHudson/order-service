@@ -91,7 +91,7 @@ func (s *orderStore) UpdateStatus(ctx context.Context, id uuid.UUID, status doma
 func (s *orderStore) UpdateProcessingResult(ctx context.Context, id uuid.UUID, price, amount, quantity *decimal.Decimal, status domain.OrderStatus) error {
 	const query = `
 		UPDATE orders 
-		SET price = $1, amount = $2, quantity = $3, status $4, updated_at = $5 
+		SET price = $1, amount = $2, quantity = $3, status = $4, updated_at = $5 
 		WHERE id = $6
 			AND updated_at <= $5 
 			AND status NOT IN ('SUCCESS', 'FAILED', 'CANCELED')`

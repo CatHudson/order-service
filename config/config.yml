@@ -41,4 +41,5 @@ kafka:
     orderResultTopic: "order-result"
   consumers:
     createOrderTopic: "create-order"
+    orderResultTopic: "order-result"
     groupId: "order-service"

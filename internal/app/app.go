@@ -6,6 +6,7 @@ import (
 	"github.com/cathudson/order-service/internal/producer"
 	"github.com/cathudson/order-service/internal/proto"
 	"github.com/cathudson/order-service/internal/store"
+	"go.uber.org/zap"
 )
 
 type App struct {
@@ -15,9 +16,9 @@ type App struct {
 	proto.UnimplementedOrderServiceServer
 }
 
-func New(createOrderProducer producer.CreateOrderProducer, orderStore store.OrderStore) *App {
+func New(createOrderProducer producer.CreateOrderProducer, orderStore store.OrderStore, orderResultStore store.OrderResultStore, logger *zap.SugaredLogger) *App {
 	return &App{
-		createOrderHandler: newCreateOrderHandler(createOrderProducer),
+		createOrderHandler: newCreateOrderHandler(createOrderProducer, orderResultStore, orderStore, logger),
 		getOrderHandler:    newGetOrderHandler(orderStore),
 	}
 }

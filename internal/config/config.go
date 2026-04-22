@@ -33,6 +33,7 @@ type KafkaConfig struct {
 
 type KafkaConsumerConfig struct {
 	CreateOrderTopic string `yaml:"createOrderTopic"`
+	OrderResultTopic string `yaml:"orderResultTopic"`
 	GroupID          string `yaml:"groupId"`
 }
 

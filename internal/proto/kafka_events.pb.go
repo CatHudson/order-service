@@ -129,8 +129,8 @@ type OrderResultEvent struct {
 	Side          OrderSide              `protobuf:"varint,2,opt,name=side,proto3,enum=order.v1.OrderSide" json:"side,omitempty"`
 	OrderBy       OrderBy                `protobuf:"varint,3,opt,name=order_by,json=orderBy,proto3,enum=order.v1.OrderBy" json:"order_by,omitempty"`
 	Status        OrderStatus            `protobuf:"varint,4,opt,name=status,proto3,enum=order.v1.OrderStatus" json:"status,omitempty"`
-	Price         *decimal.Decimal       `protobuf:"bytes,5,opt,name=price,proto3,oneof" json:"price,omitempty"`
-	Amount        *decimal.Decimal       `protobuf:"bytes,6,opt,name=amount,proto3,oneof" json:"amount,omitempty"`
+	Price         *money.Money           `protobuf:"bytes,5,opt,name=price,proto3,oneof" json:"price,omitempty"`
+	Amount        *money.Money           `protobuf:"bytes,6,opt,name=amount,proto3,oneof" json:"amount,omitempty"`
 	Quantity      *decimal.Decimal       `protobuf:"bytes,7,opt,name=quantity,proto3,oneof" json:"quantity,omitempty"`
 	ErrorMessage  *string                `protobuf:"bytes,8,opt,name=error_message,json=errorMessage,proto3,oneof" json:"error_message,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -195,14 +195,14 @@ func (x *OrderResultEvent) GetStatus() OrderStatus {
 	return OrderStatus_ORDER_STATUS_UNSPECIFIED
 }
 
-func (x *OrderResultEvent) GetPrice() *decimal.Decimal {
+func (x *OrderResultEvent) GetPrice() *money.Money {
 	if x != nil {
 		return x.Price
 	}
 	return nil
 }
 
-func (x *OrderResultEvent) GetAmount() *decimal.Decimal {
+func (x *OrderResultEvent) GetAmount() *money.Money {
 	if x != nil {
 		return x.Amount
 	}
@@ -239,14 +239,14 @@ const file_kafka_events_proto_rawDesc = "" +
 	"\x06amount\x18\a \x01(\v2\x12.google.type.MoneyH\x01R\x06amount\x88\x01\x01\x12'\n" +
 	"\x04side\x18\b \x01(\x0e2\x13.order.v1.OrderSideR\x04sideB\v\n" +
 	"\t_quantityB\t\n" +
-	"\a_amount\"\xb1\x03\n" +
+	"\a_amount\"\xad\x03\n" +
 	"\x10OrderResultEvent\x12\x1e\n" +
 	"\x02id\x18\x01 \x01(\v2\x0e.order.v1.UUIDR\x02id\x12'\n" +
 	"\x04side\x18\x02 \x01(\x0e2\x13.order.v1.OrderSideR\x04side\x12,\n" +
 	"\border_by\x18\x03 \x01(\x0e2\x11.order.v1.OrderByR\aorderBy\x12-\n" +
-	"\x06status\x18\x04 \x01(\x0e2\x15.order.v1.OrderStatusR\x06status\x12/\n" +
-	"\x05price\x18\x05 \x01(\v2\x14.google.type.DecimalH\x00R\x05price\x88\x01\x01\x121\n" +
-	"\x06amount\x18\x06 \x01(\v2\x14.google.type.DecimalH\x01R\x06amount\x88\x01\x01\x125\n" +
+	"\x06status\x18\x04 \x01(\x0e2\x15.order.v1.OrderStatusR\x06status\x12-\n" +
+	"\x05price\x18\x05 \x01(\v2\x12.google.type.MoneyH\x00R\x05price\x88\x01\x01\x12/\n" +
+	"\x06amount\x18\x06 \x01(\v2\x12.google.type.MoneyH\x01R\x06amount\x88\x01\x01\x125\n" +
 	"\bquantity\x18\a \x01(\v2\x14.google.type.DecimalH\x02R\bquantity\x88\x01\x01\x12(\n" +
 	"\rerror_message\x18\b \x01(\tH\x03R\ferrorMessage\x88\x01\x01B\b\n" +
 	"\x06_priceB\t\n" +
@@ -290,8 +290,8 @@ var file_kafka_events_proto_depIdxs = []int32{
 	6,  // 9: order.v1.OrderResultEvent.side:type_name -> order.v1.OrderSide
 	3,  // 10: order.v1.OrderResultEvent.order_by:type_name -> order.v1.OrderBy
 	7,  // 11: order.v1.OrderResultEvent.status:type_name -> order.v1.OrderStatus
-	4,  // 12: order.v1.OrderResultEvent.price:type_name -> google.type.Decimal
-	4,  // 13: order.v1.OrderResultEvent.amount:type_name -> google.type.Decimal
+	5,  // 12: order.v1.OrderResultEvent.price:type_name -> google.type.Money
+	5,  // 13: order.v1.OrderResultEvent.amount:type_name -> google.type.Money
 	4,  // 14: order.v1.OrderResultEvent.quantity:type_name -> google.type.Decimal
 	15, // [15:15] is the sub-list for method output_type
 	15, // [15:15] is the sub-list for method input_type
