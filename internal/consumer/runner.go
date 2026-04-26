@@ -75,22 +75,17 @@ func (r *Runner[M]) Run(ctx context.Context) {
 }
 
 func (r *Runner[M]) handleWithRetry(ctx context.Context, entity M, key []byte) {
-	const retryTimeout = 30 * time.Second
-	retryCtx, cancel := context.WithTimeout(ctx, retryTimeout)
-	defer cancel()
-
 	attempt := 0
 	for {
-		err := r.handler.Handle(retryCtx, entity)
+		err := r.handler.Handle(ctx, entity)
 		if err == nil {
-			break
+			return
 		}
 		if errors.Is(err, errSkipMessage) {
-			r.logger.Infow("skip message handler")
-			r.writeToDLQ(retryCtx, entity, key)
-			break
+			r.logger.Infow("skip message from handler, sending to DLQ")
+			r.writeToDLQ(ctx, entity, key)
+			return
 		}
-		r.logger.Errorw("runner failed to handle message, retrying", "error", err, "attempt", attempt)
 
 		delay := baseDelay << attempt
 		if delay > maxDelay {
@@ -98,10 +93,13 @@ func (r *Runner[M]) handleWithRetry(ctx context.Context, entity M, key []byte) {
 		}
 		attempt++
 
+		r.logger.Errorw("transient error, retrying",
+			"error", err, "attempt", attempt, "delay", delay)
+
 		select {
-		case <-retryCtx.Done():
-			r.logger.Warnw("retry deadline exceeded, sending to DLQ", "attempt", attempt)
-			r.writeToDLQ(ctx, entity, key)
+		case <-ctx.Done():
+			r.logger.Warnw("shutdown during retry, message will be redelivered",
+				"attempt", attempt)
 			return
 		case <-time.After(delay):
 		}

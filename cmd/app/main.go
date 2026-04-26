@@ -107,8 +107,11 @@ func run() error {
 		Addr:  kafka.TCP(cfg.Kafka.Address),
 		Topic: cfg.Kafka.Producers.DLQ,
 	}
+	defer dlqWriter.Close()
 	createOrderProducer := producer.NewCreateOrderProducer(cfg.Kafka)
+	defer createOrderProducer.Close()
 	orderResultProducer := producer.NewOrderResultProducer(cfg.Kafka)
+	defer orderResultProducer.Close()
 
 	// asynq
 	mux := asynq.NewServeMux()
@@ -128,7 +131,7 @@ func run() error {
 	if err != nil {
 		return fmt.Errorf("failed to start asynq server: %w", err)
 	}
-	defer asynqServer.Stop()
+	defer asynqServer.Shutdown()
 
 	// kafka consumers
 	createOrderConsumer := consumer.NewCreateOrderConsumer(asynqClient, logger)
@@ -137,6 +140,7 @@ func run() error {
 		Topic:   cfg.Kafka.Consumers.CreateOrderTopic,
 		GroupID: cfg.Kafka.Consumers.GroupID,
 	})
+	defer createOrderReader.Close()
 	createOrderRunner := consumer.NewRunner(createOrderReader, dlqWriter, createOrderConsumer, func() *proto.CreateOrderEvent { return &proto.CreateOrderEvent{} }, logger)
 	go createOrderRunner.Run(ctx)
 
@@ -146,6 +150,7 @@ func run() error {
 		Topic:   cfg.Kafka.Consumers.OrderResultTopic,
 		GroupID: cfg.Kafka.Consumers.GroupID,
 	})
+	defer orderResultReader.Close()
 	orderResultRunner := consumer.NewRunner(orderResultReader, dlqWriter, orderResultConsumer, func() *proto.OrderResultEvent { return &proto.OrderResultEvent{} }, logger)
 	go orderResultRunner.Run(ctx)
 
@@ -157,32 +162,20 @@ func run() error {
 	server := grpc.NewServer(
 		grpc.UnaryInterceptor(interceptor.RequestIDInterceptor),
 	)
+	go func() {
+		<-ctx.Done()
+		server.GracefulStop()
+	}()
 
 	// health check
 	healthServer := gh.NewServer()
+	defer healthServer.Shutdown()
 	grpc_health_v1.RegisterHealthServer(server, healthServer)
 	go health.NewWatcher(healthServer, primary, replica, connContainer.SetReplicaHealthy).Run(ctx)
 
 	proto.RegisterOrderServiceServer(server, app)
 	reflection.Register(server)
-	go func() {
-		<-ctx.Done()
-		server.GracefulStop()
-		healthServer.Shutdown()
-		asynqServer.Shutdown()
-		if err = createOrderReader.Close(); err != nil {
-			logger.Errorf("failed to close consumer: %v", err)
-		}
-		if err = orderResultReader.Close(); err != nil {
-			logger.Errorf("failed to close consumer: %v", err)
-		}
-		if err = createOrderProducer.Close(); err != nil {
-			logger.Errorf("failed to close producer: %v", err)
-		}
-		if err = orderResultProducer.Close(); err != nil {
-			logger.Errorf("failed to close producer: %v", err)
-		}
-	}()
+
 	err = server.Serve(listener)
 	if err != nil {
 		return fmt.Errorf("failed to serve: %w", err)

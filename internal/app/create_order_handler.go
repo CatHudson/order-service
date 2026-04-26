@@ -39,6 +39,10 @@ func (h *createOrderHandler) handle(ctx context.Context, request *proto.CreateOr
 		return nil, err
 	}
 
+	const timeout = 30 * time.Second
+	ctx, cancel := context.WithTimeout(ctx, timeout)
+	defer cancel()
+
 	entity := mapper.CreateOrderEventFromGrpc(request)
 	err = h.createOrderProducer.Produce(ctx, entity)
 	if err != nil {
@@ -52,7 +56,7 @@ func (h *createOrderHandler) handle(ctx context.Context, request *proto.CreateOr
 			h.logger.Warnw("redis error, falling back to Postgres",
 				"orderID", entity.GetId().GetValue(), "error", err)
 		}
-		return h.orderResultFromStore(ctx, responseEntity, entity)
+		return h.orderResultFromStore(ctx, responseEntity, entity), nil
 	}
 
 	responseEntity = enrichOrderResponseFromCache(responseEntity, orderResult)
@@ -98,7 +102,7 @@ func enrichOrderResponseFromCache(responseEntity *proto.Order, event *proto.Orde
 	return responseEntity
 }
 
-func (h *createOrderHandler) orderResultFromStore(ctx context.Context, responseEntity *proto.Order, event *proto.CreateOrderEvent) (*proto.CreateOrderResponse, error) {
+func (h *createOrderHandler) orderResultFromStore(ctx context.Context, responseEntity *proto.Order, event *proto.CreateOrderEvent) *proto.CreateOrderResponse {
 	pOrder, err := h.orderStore.GetByID(ctx, uuid.MustParse(event.GetId().GetValue()))
 	if err != nil {
 		if errors.Is(err, domain.ErrOrderNotFound) {
@@ -106,7 +110,7 @@ func (h *createOrderHandler) orderResultFromStore(ctx context.Context, responseE
 		} else {
 			h.logger.Warnw("Postgres fallback failed", "orderID", event.GetId().GetValue(), "error", err)
 		}
-		return &proto.CreateOrderResponse{Order: responseEntity}, nil
+		return &proto.CreateOrderResponse{Order: responseEntity}
 	}
 	responseEntity.Price = util.DecimalToMoney(pOrder.Price)
 	responseEntity.Status = mapper.OrderStatusToProto(pOrder.Status)
@@ -114,7 +118,7 @@ func (h *createOrderHandler) orderResultFromStore(ctx context.Context, responseE
 	responseEntity.Quantity = util.DecimalToProto(pOrder.Quantity)
 	responseEntity.Amount = util.DecimalToMoney(pOrder.Amount)
 
-	return &proto.CreateOrderResponse{Order: responseEntity}, nil
+	return &proto.CreateOrderResponse{Order: responseEntity}
 }
 
 func responseTemplate(entity *proto.CreateOrderEvent) *proto.Order {
