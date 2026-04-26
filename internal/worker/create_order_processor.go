@@ -136,18 +136,17 @@ func (p *CreateOrderProcessor) process(ctx context.Context, order *domain.Order)
 func orderFromTask(t *task.CreateOrderTask) *domain.Order {
 	now := time.Now()
 	return &domain.Order{
-		ID:             t.ID,
-		AccountID:      t.AccountID,
-		IdempotencyKey: t.IdempotencyKey,
-		InstrumentID:   t.InstrumentID,
-		Side:           t.OrderSide,
-		OrderBy:        t.OrderBy,
-		Amount:         t.Amount,
-		Quantity:       t.Quantity,
-		Price:          nil,
-		Status:         domain.OrderStatusNew,
-		ErrorMessage:   nil,
-		UpdatedAt:      now,
-		CreatedAt:      now,
+		ID:           t.ID,
+		AccountID:    t.AccountID,
+		InstrumentID: t.InstrumentID,
+		Side:         t.OrderSide,
+		OrderBy:      t.OrderBy,
+		Amount:       t.Amount,
+		Quantity:     t.Quantity,
+		Price:        nil,
+		Status:       domain.OrderStatusNew,
+		ErrorMessage: nil,
+		UpdatedAt:    now,
+		CreatedAt:    now,
 	}
 }

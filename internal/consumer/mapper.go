@@ -11,14 +11,13 @@ import (
 
 func taskFromEvent(event *pe.CreateOrderEvent) *task.CreateOrderTask {
 	entity := &task.CreateOrderTask{
-		ID:             uuid.MustParse(event.GetId().GetValue()),
-		AccountID:      uuid.MustParse(event.GetAccountId().GetValue()),
-		IdempotencyKey: uuid.MustParse(event.GetIdempotencyKey().GetValue()),
-		InstrumentID:   uuid.MustParse(event.GetInstrumentId().GetValue()),
-		OrderBy:        mapper.OrderByFromProto(event.GetOrderBy()),
-		Quantity:       nil,
-		Amount:         nil,
-		OrderSide:      mapper.OrderSideFromProto(event.GetSide()),
+		ID:           uuid.MustParse(event.GetId().GetValue()),
+		AccountID:    uuid.MustParse(event.GetAccountId().GetValue()),
+		InstrumentID: uuid.MustParse(event.GetInstrumentId().GetValue()),
+		OrderBy:      mapper.OrderByFromProto(event.GetOrderBy()),
+		Quantity:     nil,
+		Amount:       nil,
+		OrderSide:    mapper.OrderSideFromProto(event.GetSide()),
 	}
 
 	if entity.OrderBy == domain.OrderByQuantity {

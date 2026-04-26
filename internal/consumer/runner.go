@@ -75,23 +75,19 @@ func (r *Runner[M]) Run(ctx context.Context) {
 }
 
 func (r *Runner[M]) handleWithRetry(ctx context.Context, entity M, key []byte) {
+	const retryTimeout = 30 * time.Second
+	retryCtx, cancel := context.WithTimeout(ctx, retryTimeout)
+	defer cancel()
+
 	attempt := 0
 	for {
-		err := r.handler.Handle(ctx, entity)
+		err := r.handler.Handle(retryCtx, entity)
 		if err == nil {
 			break
 		}
 		if errors.Is(err, errSkipMessage) {
 			r.logger.Infow("skip message handler")
-			value, mErr := protoxjson.Marshal(entity)
-			if mErr != nil {
-				r.logger.Errorw("runner failed to marshal message, skip", "error", mErr)
-				break
-			}
-			dErr := r.dlqWriter.WriteMessages(ctx, kafka.Message{Key: key, Value: value})
-			if dErr != nil {
-				r.logger.Errorw("runner failed to write message to DLQ", "error", dErr)
-			}
+			r.writeToDLQ(retryCtx, entity, key)
 			break
 		}
 		r.logger.Errorw("runner failed to handle message, retrying", "error", err, "attempt", attempt)
@@ -103,9 +99,23 @@ func (r *Runner[M]) handleWithRetry(ctx context.Context, entity M, key []byte) {
 		attempt++
 
 		select {
-		case <-ctx.Done():
+		case <-retryCtx.Done():
+			r.logger.Warnw("retry deadline exceeded, sending to DLQ", "attempt", attempt)
+			r.writeToDLQ(ctx, entity, key)
 			return
 		case <-time.After(delay):
 		}
+	}
+}
+
+func (r *Runner[M]) writeToDLQ(ctx context.Context, entity M, key []byte) {
+	value, mErr := protoxjson.Marshal(entity)
+	if mErr != nil {
+		r.logger.Errorw("runner failed to marshal message for DLQ", "error", mErr)
+		return
+	}
+	dErr := r.dlqWriter.WriteMessages(ctx, kafka.Message{Key: key, Value: value})
+	if dErr != nil {
+		r.logger.Errorw("runner failed to write message to DLQ", "error", dErr)
 	}
 }

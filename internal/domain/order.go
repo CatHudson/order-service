@@ -8,19 +8,18 @@ import (
 )
 
 type Order struct {
-	ID             uuid.UUID        `db:"id"`
-	AccountID      uuid.UUID        `db:"account_id"`
-	IdempotencyKey uuid.UUID        `db:"idempotency_key"`
-	InstrumentID   uuid.UUID        `db:"instrument_id"`
-	Side           OrderSide        `db:"side"`
-	OrderBy        OrderBy          `db:"order_by"`
-	Amount         *decimal.Decimal `db:"amount"`
-	Quantity       *decimal.Decimal `db:"quantity"`
-	Price          *decimal.Decimal `db:"price"`
-	Status         OrderStatus      `db:"status"`
-	ErrorMessage   *string          `db:"error_message"`
-	UpdatedAt      time.Time        `db:"updated_at"`
-	CreatedAt      time.Time        `db:"created_at"`
+	ID           uuid.UUID        `db:"id"`
+	AccountID    uuid.UUID        `db:"account_id"`
+	InstrumentID uuid.UUID        `db:"instrument_id"`
+	Side         OrderSide        `db:"side"`
+	OrderBy      OrderBy          `db:"order_by"`
+	Amount       *decimal.Decimal `db:"amount"`
+	Quantity     *decimal.Decimal `db:"quantity"`
+	Price        *decimal.Decimal `db:"price"`
+	Status       OrderStatus      `db:"status"`
+	ErrorMessage *string          `db:"error_message"`
+	UpdatedAt    time.Time        `db:"updated_at"`
+	CreatedAt    time.Time        `db:"created_at"`
 }
 
 func (o *Order) IsTerminal() bool {

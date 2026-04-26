@@ -119,16 +119,15 @@ func (h *createOrderHandler) orderResultFromStore(ctx context.Context, responseE
 
 func responseTemplate(entity *proto.CreateOrderEvent) *proto.Order {
 	return &proto.Order{
-		Id:             entity.GetId(),
-		AccountId:      entity.GetAccountId(),
-		IdempotencyKey: entity.GetIdempotencyKey(),
-		InstrumentId:   entity.GetInstrumentId(),
-		OrderBy:        entity.GetOrderBy(),
-		Quantity:       entity.GetQuantity(),
-		Amount:         entity.GetAmount(),
-		Price:          nil,
-		Side:           entity.GetSide(),
-		Status:         proto.OrderStatus_ORDER_STATUS_NEW,
-		ErrorMessage:   nil,
+		Id:           entity.GetId(),
+		AccountId:    entity.GetAccountId(),
+		InstrumentId: entity.GetInstrumentId(),
+		OrderBy:      entity.GetOrderBy(),
+		Quantity:     entity.GetQuantity(),
+		Amount:       entity.GetAmount(),
+		Price:        nil,
+		Side:         entity.GetSide(),
+		Status:       proto.OrderStatus_ORDER_STATUS_NEW,
+		ErrorMessage: nil,
 	}
 }

@@ -12,12 +12,11 @@ option go_package = "github.com/cathudson/order-service/internal/proto";
 message CreateOrderEvent {
   UUID id = 1;
   UUID account_id = 2;
-  UUID idempotency_key = 3;
-  UUID instrument_id = 4;
-  OrderBy order_by = 5;
-  optional google.type.Decimal quantity = 6;
-  optional google.type.Money amount = 7;
-  OrderSide side = 8;
+  UUID instrument_id = 3;
+  OrderBy order_by = 4;
+  optional google.type.Decimal quantity = 5;
+  optional google.type.Money amount = 6;
+  OrderSide side = 7;
 }
 
 message OrderResultEvent {

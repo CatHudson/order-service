@@ -24,17 +24,16 @@ const (
 )
 
 type CreateOrderEvent struct {
-	state          protoimpl.MessageState `protogen:"open.v1"`
-	Id             *UUID                  `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	AccountId      *UUID                  `protobuf:"bytes,2,opt,name=account_id,json=accountId,proto3" json:"account_id,omitempty"`
-	IdempotencyKey *UUID                  `protobuf:"bytes,3,opt,name=idempotency_key,json=idempotencyKey,proto3" json:"idempotency_key,omitempty"`
-	InstrumentId   *UUID                  `protobuf:"bytes,4,opt,name=instrument_id,json=instrumentId,proto3" json:"instrument_id,omitempty"`
-	OrderBy        OrderBy                `protobuf:"varint,5,opt,name=order_by,json=orderBy,proto3,enum=order.v1.OrderBy" json:"order_by,omitempty"`
-	Quantity       *decimal.Decimal       `protobuf:"bytes,6,opt,name=quantity,proto3,oneof" json:"quantity,omitempty"`
-	Amount         *money.Money           `protobuf:"bytes,7,opt,name=amount,proto3,oneof" json:"amount,omitempty"`
-	Side           OrderSide              `protobuf:"varint,8,opt,name=side,proto3,enum=order.v1.OrderSide" json:"side,omitempty"`
-	unknownFields  protoimpl.UnknownFields
-	sizeCache      protoimpl.SizeCache
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            *UUID                  `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	AccountId     *UUID                  `protobuf:"bytes,2,opt,name=account_id,json=accountId,proto3" json:"account_id,omitempty"`
+	InstrumentId  *UUID                  `protobuf:"bytes,3,opt,name=instrument_id,json=instrumentId,proto3" json:"instrument_id,omitempty"`
+	OrderBy       OrderBy                `protobuf:"varint,4,opt,name=order_by,json=orderBy,proto3,enum=order.v1.OrderBy" json:"order_by,omitempty"`
+	Quantity      *decimal.Decimal       `protobuf:"bytes,5,opt,name=quantity,proto3,oneof" json:"quantity,omitempty"`
+	Amount        *money.Money           `protobuf:"bytes,6,opt,name=amount,proto3,oneof" json:"amount,omitempty"`
+	Side          OrderSide              `protobuf:"varint,7,opt,name=side,proto3,enum=order.v1.OrderSide" json:"side,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
 }
 
 func (x *CreateOrderEvent) Reset() {
@@ -77,13 +76,6 @@ func (x *CreateOrderEvent) GetId() *UUID {
 func (x *CreateOrderEvent) GetAccountId() *UUID {
 	if x != nil {
 		return x.AccountId
-	}
-	return nil
-}
-
-func (x *CreateOrderEvent) GetIdempotencyKey() *UUID {
-	if x != nil {
-		return x.IdempotencyKey
 	}
 	return nil
 }
@@ -227,17 +219,16 @@ var File_kafka_events_proto protoreflect.FileDescriptor
 
 const file_kafka_events_proto_rawDesc = "" +
 	"\n" +
-	"\x12kafka_events.proto\x12\border.v1\x1a\vtypes.proto\x1a\x19google/type/decimal.proto\x1a\x17google/type/money.proto\x1a\vorder.proto\"\xa6\x03\n" +
+	"\x12kafka_events.proto\x12\border.v1\x1a\vtypes.proto\x1a\x19google/type/decimal.proto\x1a\x17google/type/money.proto\x1a\vorder.proto\"\xed\x02\n" +
 	"\x10CreateOrderEvent\x12\x1e\n" +
 	"\x02id\x18\x01 \x01(\v2\x0e.order.v1.UUIDR\x02id\x12-\n" +
 	"\n" +
-	"account_id\x18\x02 \x01(\v2\x0e.order.v1.UUIDR\taccountId\x127\n" +
-	"\x0fidempotency_key\x18\x03 \x01(\v2\x0e.order.v1.UUIDR\x0eidempotencyKey\x123\n" +
-	"\rinstrument_id\x18\x04 \x01(\v2\x0e.order.v1.UUIDR\finstrumentId\x12,\n" +
-	"\border_by\x18\x05 \x01(\x0e2\x11.order.v1.OrderByR\aorderBy\x125\n" +
-	"\bquantity\x18\x06 \x01(\v2\x14.google.type.DecimalH\x00R\bquantity\x88\x01\x01\x12/\n" +
-	"\x06amount\x18\a \x01(\v2\x12.google.type.MoneyH\x01R\x06amount\x88\x01\x01\x12'\n" +
-	"\x04side\x18\b \x01(\x0e2\x13.order.v1.OrderSideR\x04sideB\v\n" +
+	"account_id\x18\x02 \x01(\v2\x0e.order.v1.UUIDR\taccountId\x123\n" +
+	"\rinstrument_id\x18\x03 \x01(\v2\x0e.order.v1.UUIDR\finstrumentId\x12,\n" +
+	"\border_by\x18\x04 \x01(\x0e2\x11.order.v1.OrderByR\aorderBy\x125\n" +
+	"\bquantity\x18\x05 \x01(\v2\x14.google.type.DecimalH\x00R\bquantity\x88\x01\x01\x12/\n" +
+	"\x06amount\x18\x06 \x01(\v2\x12.google.type.MoneyH\x01R\x06amount\x88\x01\x01\x12'\n" +
+	"\x04side\x18\a \x01(\x0e2\x13.order.v1.OrderSideR\x04sideB\v\n" +
 	"\t_quantityB\t\n" +
 	"\a_amount\"\xad\x03\n" +
 	"\x10OrderResultEvent\x12\x1e\n" +
@@ -280,24 +271,23 @@ var file_kafka_events_proto_goTypes = []any{
 var file_kafka_events_proto_depIdxs = []int32{
 	2,  // 0: order.v1.CreateOrderEvent.id:type_name -> order.v1.UUID
 	2,  // 1: order.v1.CreateOrderEvent.account_id:type_name -> order.v1.UUID
-	2,  // 2: order.v1.CreateOrderEvent.idempotency_key:type_name -> order.v1.UUID
-	2,  // 3: order.v1.CreateOrderEvent.instrument_id:type_name -> order.v1.UUID
-	3,  // 4: order.v1.CreateOrderEvent.order_by:type_name -> order.v1.OrderBy
-	4,  // 5: order.v1.CreateOrderEvent.quantity:type_name -> google.type.Decimal
-	5,  // 6: order.v1.CreateOrderEvent.amount:type_name -> google.type.Money
-	6,  // 7: order.v1.CreateOrderEvent.side:type_name -> order.v1.OrderSide
-	2,  // 8: order.v1.OrderResultEvent.id:type_name -> order.v1.UUID
-	6,  // 9: order.v1.OrderResultEvent.side:type_name -> order.v1.OrderSide
-	3,  // 10: order.v1.OrderResultEvent.order_by:type_name -> order.v1.OrderBy
-	7,  // 11: order.v1.OrderResultEvent.status:type_name -> order.v1.OrderStatus
-	5,  // 12: order.v1.OrderResultEvent.price:type_name -> google.type.Money
-	5,  // 13: order.v1.OrderResultEvent.amount:type_name -> google.type.Money
-	4,  // 14: order.v1.OrderResultEvent.quantity:type_name -> google.type.Decimal
-	15, // [15:15] is the sub-list for method output_type
-	15, // [15:15] is the sub-list for method input_type
-	15, // [15:15] is the sub-list for extension type_name
-	15, // [15:15] is the sub-list for extension extendee
-	0,  // [0:15] is the sub-list for field type_name
+	2,  // 2: order.v1.CreateOrderEvent.instrument_id:type_name -> order.v1.UUID
+	3,  // 3: order.v1.CreateOrderEvent.order_by:type_name -> order.v1.OrderBy
+	4,  // 4: order.v1.CreateOrderEvent.quantity:type_name -> google.type.Decimal
+	5,  // 5: order.v1.CreateOrderEvent.amount:type_name -> google.type.Money
+	6,  // 6: order.v1.CreateOrderEvent.side:type_name -> order.v1.OrderSide
+	2,  // 7: order.v1.OrderResultEvent.id:type_name -> order.v1.UUID
+	6,  // 8: order.v1.OrderResultEvent.side:type_name -> order.v1.OrderSide
+	3,  // 9: order.v1.OrderResultEvent.order_by:type_name -> order.v1.OrderBy
+	7,  // 10: order.v1.OrderResultEvent.status:type_name -> order.v1.OrderStatus
+	5,  // 11: order.v1.OrderResultEvent.price:type_name -> google.type.Money
+	5,  // 12: order.v1.OrderResultEvent.amount:type_name -> google.type.Money
+	4,  // 13: order.v1.OrderResultEvent.quantity:type_name -> google.type.Decimal
+	14, // [14:14] is the sub-list for method output_type
+	14, // [14:14] is the sub-list for method input_type
+	14, // [14:14] is the sub-list for extension type_name
+	14, // [14:14] is the sub-list for extension extendee
+	0,  // [0:14] is the sub-list for field type_name
 }
 
 func init() { file_kafka_events_proto_init() }

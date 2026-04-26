@@ -11,15 +11,14 @@ option go_package = "github.com/cathudson/order-service/internal/proto";
 message Order {
   UUID id = 1;
   UUID account_id = 2;
-  UUID idempotency_key = 3;
-  UUID instrument_id = 4;
-  OrderBy order_by = 5;
-  optional google.type.Decimal quantity = 6;
-  optional google.type.Money amount = 7;
-  optional google.type.Money price = 8;
-  OrderSide side = 9;
-  OrderStatus status = 10;
-  optional string error_message = 11;
+  UUID instrument_id = 3;
+  OrderBy order_by = 4;
+  optional google.type.Decimal quantity = 5;
+  optional google.type.Money amount = 6;
+  optional google.type.Money price = 7;
+  OrderSide side = 8;
+  OrderStatus status = 9;
+  optional string error_message = 10;
 }
 
 enum OrderBy {
