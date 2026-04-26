@@ -2,7 +2,6 @@
 create table if not exists orders (
     id                          uuid primary key,
     account_id                  uuid not null,
-    idempotency_key             uuid not null unique,
     instrument_id               uuid not null,
     order_by                    varchar(50) not null check (order_by in ('QUANTITY', 'AMOUNT')),
     side                        varchar(50) not null check (side in ('BUY', 'SELL')),

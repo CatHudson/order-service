@@ -13,14 +13,13 @@ import (
 
 func CreateOrderEventFromGrpc(request *proto.CreateOrderRequest) *proto.CreateOrderEvent {
 	entity := &proto.CreateOrderEvent{
-		Id:             uuidToProto(util.UUID()),
-		AccountId:      request.GetAccountId(),
-		IdempotencyKey: request.GetIdempotencyKey(),
-		InstrumentId:   request.GetInstrumentId(),
-		OrderBy:        proto.OrderBy_ORDER_BY_UNSPECIFIED,
-		Quantity:       nil,
-		Amount:         nil,
-		Side:           request.GetSide(),
+		Id:           request.GetIdempotencyKey(),
+		AccountId:    request.GetAccountId(),
+		InstrumentId: request.GetInstrumentId(),
+		OrderBy:      proto.OrderBy_ORDER_BY_UNSPECIFIED,
+		Quantity:     nil,
+		Amount:       nil,
+		Side:         request.GetSide(),
 	}
 
 	switch request.GetAmount().(type) {
@@ -67,17 +66,16 @@ func OrderSideFromProto(side proto.OrderSide) domain.OrderSide {
 
 func OrderToProto(entity *domain.Order) *proto.Order {
 	fixture := &proto.Order{
-		Id:             uuidToProto(entity.ID),
-		AccountId:      uuidToProto(entity.AccountID),
-		IdempotencyKey: uuidToProto(entity.IdempotencyKey),
-		InstrumentId:   uuidToProto(entity.InstrumentID),
-		OrderBy:        OrderByToProto(entity.OrderBy),
-		Quantity:       nil,
-		Amount:         nil,
-		Price:          nil,
-		Side:           OrderSideToProto(entity.Side),
-		Status:         OrderStatusToProto(entity.Status),
-		ErrorMessage:   entity.ErrorMessage,
+		Id:           uuidToProto(entity.ID),
+		AccountId:    uuidToProto(entity.AccountID),
+		InstrumentId: uuidToProto(entity.InstrumentID),
+		OrderBy:      OrderByToProto(entity.OrderBy),
+		Quantity:     nil,
+		Amount:       nil,
+		Price:        nil,
+		Side:         OrderSideToProto(entity.Side),
+		Status:       OrderStatusToProto(entity.Status),
+		ErrorMessage: entity.ErrorMessage,
 	}
 
 	if entity.Quantity != nil {

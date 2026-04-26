@@ -31,7 +31,7 @@ func (c *CreateOrderConsumer) Handle(ctx context.Context, event *pe.CreateOrderE
 	}
 
 	t := taskFromEvent(event)
-	err = c.asynq.Enqueue(ctx, task.CreateOrderTaskType, t, asynq.TaskID(event.GetIdempotencyKey().GetValue()))
+	err = c.asynq.Enqueue(ctx, task.CreateOrderTaskType, t, asynq.TaskID(event.GetId().GetValue()))
 	if err != nil {
 		if errors.Is(err, asynq.ErrTaskIDConflict) {
 			c.logger.Infow("skipped duplicate task", "error", err)
@@ -49,9 +49,6 @@ func (c *CreateOrderConsumer) validate(event *pe.CreateOrderEvent) error {
 	}
 	if _, err := uuid.Parse(event.GetAccountId().GetValue()); err != nil {
 		return fmt.Errorf("create-order consumer: invalid accountID: %w", err)
-	}
-	if _, err := uuid.Parse(event.GetIdempotencyKey().GetValue()); err != nil {
-		return fmt.Errorf("create-order consumer: invalid idempotencyKey: %w", err)
 	}
 	if _, err := uuid.Parse(event.GetInstrumentId().GetValue()); err != nil {
 		return fmt.Errorf("create-order consumer: invalid instrumentID: %w", err)

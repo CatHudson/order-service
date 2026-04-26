@@ -36,7 +36,6 @@ func (s *orderStore) Create(ctx context.Context, order *domain.Order) error {
 	const query = `INSERT INTO orders (
                     id, 
                     account_id, 
-                    idempotency_key, 
                     instrument_id,
                     order_by, 
                     side, 
@@ -49,7 +48,6 @@ func (s *orderStore) Create(ctx context.Context, order *domain.Order) error {
                     updated_at) 
 			VALUES (:id, 
 					:account_id, 
-					:idempotency_key, 
 					:instrument_id,
 					:order_by, 
 					:side, 
