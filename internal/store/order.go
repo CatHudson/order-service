@@ -18,7 +18,7 @@ import (
 
 type OrderStore interface {
 	Create(ctx context.Context, order *domain.Order) error
-	UpdateStatus(ctx context.Context, id uuid.UUID, status domain.OrderStatus) error
+	UpdateStatus(ctx context.Context, id uuid.UUID, status domain.OrderStatus, errorMessage *string) error
 	UpdateProcessingResult(ctx context.Context, id uuid.UUID, price, amount, quantity *decimal.Decimal, status domain.OrderStatus) error
 	GetByID(ctx context.Context, id uuid.UUID) (*domain.Order, error)
 	GetAllByStatus(ctx context.Context, status domain.OrderStatus) ([]*domain.Order, error)
@@ -72,15 +72,28 @@ func (s *orderStore) Create(ctx context.Context, order *domain.Order) error {
 	return nil
 }
 
-func (s *orderStore) UpdateStatus(ctx context.Context, id uuid.UUID, status domain.OrderStatus) error {
-	const query = `
-		UPDATE orders 
-		SET status = $1, updated_at = $2 
-		WHERE id = $3 
-		AND updated_at <= $2 
-		AND status NOT IN ('SUCCESS', 'FAILED', 'CANCELED')`
+func (s *orderStore) UpdateStatus(ctx context.Context, id uuid.UUID, status domain.OrderStatus, errorMessage *string) error {
+	const queryWithError = `
+        UPDATE orders 
+        SET status = $1, error_message = $2, updated_at = $3 
+        WHERE id = $4 
+        AND updated_at <= $3 
+        AND status NOT IN ('SUCCESS', 'FAILED', 'CANCELED')`
 
-	_, err := s.conn.Primary(ctx).ExecContext(ctx, query, status, time.Now(), id)
+	const queryWithoutError = `
+        UPDATE orders 
+        SET status = $1, updated_at = $2 
+        WHERE id = $3 
+        AND updated_at <= $2 
+        AND status NOT IN ('SUCCESS', 'FAILED', 'CANCELED')`
+
+	var err error
+	now := time.Now()
+	if errorMessage != nil {
+		_, err = s.conn.Primary(ctx).ExecContext(ctx, queryWithError, status, *errorMessage, now, id)
+	} else {
+		_, err = s.conn.Primary(ctx).ExecContext(ctx, queryWithoutError, status, now, id)
+	}
 	if err != nil {
 		return fmt.Errorf("update order status: %w", err)
 	}

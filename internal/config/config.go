@@ -40,6 +40,7 @@ type KafkaConsumerConfig struct {
 type KafkaProducerConfig struct {
 	CreateOrderTopic string `yaml:"createOrderTopic"`
 	OrderResultTopic string `yaml:"orderResultTopic"`
+	DLQ              string `yaml:"dlq"`
 }
 
 type GRPCConfig struct {

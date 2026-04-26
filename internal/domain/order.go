@@ -23,6 +23,17 @@ type Order struct {
 	CreatedAt      time.Time        `db:"created_at"`
 }
 
+func (o *Order) IsTerminal() bool {
+	switch o.Status {
+	case OrderStatusSuccess, OrderStatusFailed, OrderStatusCanceled:
+		return true
+	case OrderStatusPending, OrderStatusNew:
+		return false
+	default:
+		return false
+	}
+}
+
 type OrderBy string
 
 const (

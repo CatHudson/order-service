@@ -40,13 +40,38 @@ func (p *CreateOrderProcessor) ProcessTask(ctx context.Context, t *asynq.Task) e
 
 	order := orderFromTask(&entity)
 	err := p.orderService.CreateOrder(ctx, order)
-	if err != nil && !errors.Is(err, domain.ErrOrderAlreadyExists) {
+	switch {
+	case err == nil:
+		// fresh order - continue processing
+	case errors.Is(err, domain.ErrOrderAlreadyExists):
+		dbOrder, dbErr := p.orderService.GetByID(ctx, order.ID)
+		if dbErr != nil {
+			return fmt.Errorf("failed to fetch existing order from Postgres: %w", dbErr)
+		}
+		order = dbOrder
+	default:
 		return fmt.Errorf("create order: %w", err)
 	}
 
-	err = p.process(ctx, order)
-	if err != nil {
-		return fmt.Errorf("process order: %w", err)
+	if !order.IsTerminal() {
+		err = p.process(ctx, order)
+		if err != nil {
+			return fmt.Errorf("process order: %w", err)
+		}
+	}
+
+	orderResult := &proto.OrderResultEvent{
+		Id:           &proto.UUID{Value: order.ID.String()},
+		Side:         mapper.OrderSideToProto(order.Side),
+		OrderBy:      mapper.OrderByToProto(order.OrderBy),
+		Status:       mapper.OrderStatusToProto(order.Status),
+		Price:        util.DecimalToMoney(order.Price),
+		Amount:       util.DecimalToMoney(order.Amount),
+		Quantity:     util.DecimalToProto(order.Quantity),
+		ErrorMessage: order.ErrorMessage,
+	}
+	if err = p.orderResultProducer.Produce(ctx, orderResult); err != nil {
+		return fmt.Errorf("produce order result: %w", err)
 	}
 
 	return nil
@@ -54,7 +79,7 @@ func (p *CreateOrderProcessor) ProcessTask(ctx context.Context, t *asynq.Task) e
 
 //nolint:gosec,mnd // enough here
 func (p *CreateOrderProcessor) process(ctx context.Context, order *domain.Order) error {
-	if err := p.orderService.UpdateStatus(ctx, order.ID, domain.OrderStatusPending); err != nil {
+	if err := p.orderService.UpdateStatus(ctx, order.ID, domain.OrderStatusPending, nil); err != nil {
 		return fmt.Errorf("process order switch to pending: %w", err)
 	}
 
@@ -80,20 +105,11 @@ func (p *CreateOrderProcessor) process(ctx context.Context, order *domain.Order)
 	time.Sleep(delay)
 
 	if status != domain.OrderStatusSuccess {
-		orderResult := &proto.OrderResultEvent{
-			Id:           &proto.UUID{Value: order.ID.String()},
-			Side:         mapper.OrderSideToProto(order.Side),
-			OrderBy:      mapper.OrderByToProto(order.OrderBy),
-			Status:       mapper.OrderStatusToProto(order.Status),
-			Price:        nil,
-			Amount:       util.DecimalToMoney(order.Amount),
-			Quantity:     util.DecimalToProto(order.Quantity),
-			ErrorMessage: new("order failed due to processing error"),
+		var errorMessage *string
+		if status == domain.OrderStatusFailed {
+			errorMessage = new("order failed")
 		}
-		if err := p.orderResultProducer.Produce(ctx, orderResult); err != nil {
-			return fmt.Errorf("produce order result: %w", err)
-		}
-		if err := p.orderService.UpdateStatus(ctx, order.ID, order.Status); err != nil {
+		if err := p.orderService.UpdateStatus(ctx, order.ID, order.Status, errorMessage); err != nil {
 			return fmt.Errorf("process order terminal status: %w", err)
 		}
 		return nil
@@ -112,20 +128,6 @@ func (p *CreateOrderProcessor) process(ctx context.Context, order *domain.Order)
 		if err := p.orderService.UpdateProcessingResult(ctx, order.ID, price, order.Amount, order.Quantity, order.Status); err != nil {
 			return fmt.Errorf("process order update processing result: %w", err)
 		}
-	}
-
-	orderResult := &proto.OrderResultEvent{
-		Id:           &proto.UUID{Value: order.ID.String()},
-		Side:         mapper.OrderSideToProto(order.Side),
-		OrderBy:      mapper.OrderByToProto(order.OrderBy),
-		Status:       mapper.OrderStatusToProto(order.Status),
-		Price:        util.DecimalToMoney(order.Price),
-		Amount:       util.DecimalToMoney(order.Amount),
-		Quantity:     util.DecimalToProto(order.Quantity),
-		ErrorMessage: nil,
-	}
-	if err := p.orderResultProducer.Produce(ctx, orderResult); err != nil {
-		return fmt.Errorf("produce order result: %w", err)
 	}
 
 	return nil

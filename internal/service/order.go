@@ -39,8 +39,12 @@ func (s *OrderService) CreateOrder(ctx context.Context, order *domain.Order) err
 	})
 }
 
-func (s *OrderService) UpdateStatus(ctx context.Context, id uuid.UUID, status domain.OrderStatus) error {
-	return s.orderStore.UpdateStatus(ctx, id, status)
+func (s *OrderService) GetByID(ctx context.Context, id uuid.UUID) (*domain.Order, error) {
+	return s.orderStore.GetByID(ctx, id)
+}
+
+func (s *OrderService) UpdateStatus(ctx context.Context, id uuid.UUID, status domain.OrderStatus, errorMessage *string) error {
+	return s.orderStore.UpdateStatus(ctx, id, status, errorMessage)
 }
 
 func (s *OrderService) UpdateProcessingResult(ctx context.Context, id uuid.UUID, price, amount, quantity *decimal.Decimal, status domain.OrderStatus) error {

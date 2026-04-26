@@ -103,6 +103,10 @@ func run() error {
 	orderService := service.NewOrderService(tx, orderStore, ordersAuditLogStore)
 
 	// kafka producers
+	dlqWriter := &kafka.Writer{
+		Addr:  kafka.TCP(cfg.Kafka.Address),
+		Topic: cfg.Kafka.Producers.DLQ,
+	}
 	createOrderProducer := producer.NewCreateOrderProducer(cfg.Kafka)
 	orderResultProducer := producer.NewOrderResultProducer(cfg.Kafka)
 
@@ -133,7 +137,7 @@ func run() error {
 		Topic:   cfg.Kafka.Consumers.CreateOrderTopic,
 		GroupID: cfg.Kafka.Consumers.GroupID,
 	})
-	createOrderRunner := consumer.NewRunner(createOrderReader, createOrderConsumer, func() *proto.CreateOrderEvent { return &proto.CreateOrderEvent{} }, logger)
+	createOrderRunner := consumer.NewRunner(createOrderReader, dlqWriter, createOrderConsumer, func() *proto.CreateOrderEvent { return &proto.CreateOrderEvent{} }, logger)
 	go createOrderRunner.Run(ctx)
 
 	orderResultConsumer := consumer.NewOrderResultConsumer(orderResultStore)
@@ -142,7 +146,7 @@ func run() error {
 		Topic:   cfg.Kafka.Consumers.OrderResultTopic,
 		GroupID: cfg.Kafka.Consumers.GroupID,
 	})
-	orderResultRunner := consumer.NewRunner(orderResultReader, orderResultConsumer, func() *proto.OrderResultEvent { return &proto.OrderResultEvent{} }, logger)
+	orderResultRunner := consumer.NewRunner(orderResultReader, dlqWriter, orderResultConsumer, func() *proto.OrderResultEvent { return &proto.OrderResultEvent{} }, logger)
 	go orderResultRunner.Run(ctx)
 
 	// goroutine reporter

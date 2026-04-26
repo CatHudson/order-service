@@ -39,6 +39,7 @@ kafka:
   producers:
     createOrderTopic: "create-order"
     orderResultTopic: "order-result"
+    dlq: "dlq"
   consumers:
     createOrderTopic: "create-order"
     orderResultTopic: "order-result"

@@ -34,7 +34,7 @@ var _ store.OrderStore = &OrderStoreMock{}
 //			UpdateProcessingResultFunc: func(ctx context.Context, id uuid.UUID, price *decimal.Decimal, amount *decimal.Decimal, quantity *decimal.Decimal, status domain.OrderStatus) error {
 //				panic("mock out the UpdateProcessingResult method")
 //			},
-//			UpdateStatusFunc: func(ctx context.Context, id uuid.UUID, status domain.OrderStatus) error {
+//			UpdateStatusFunc: func(ctx context.Context, id uuid.UUID, status domain.OrderStatus, errorMessage *string) error {
 //				panic("mock out the UpdateStatus method")
 //			},
 //		}
@@ -57,7 +57,7 @@ type OrderStoreMock struct {
 	UpdateProcessingResultFunc func(ctx context.Context, id uuid.UUID, price *decimal.Decimal, amount *decimal.Decimal, quantity *decimal.Decimal, status domain.OrderStatus) error
 
 	// UpdateStatusFunc mocks the UpdateStatus method.
-	UpdateStatusFunc func(ctx context.Context, id uuid.UUID, status domain.OrderStatus) error
+	UpdateStatusFunc func(ctx context.Context, id uuid.UUID, status domain.OrderStatus, errorMessage *string) error
 
 	// calls tracks calls to the methods.
 	calls struct {
@@ -105,6 +105,8 @@ type OrderStoreMock struct {
 			ID uuid.UUID
 			// Status is the status argument value.
 			Status domain.OrderStatus
+			// ErrorMessage is the errorMessage argument value.
+			ErrorMessage *string
 		}
 	}
 	lockCreate                 sync.RWMutex
@@ -275,23 +277,25 @@ func (mock *OrderStoreMock) UpdateProcessingResultCalls() []struct {
 }
 
 // UpdateStatus calls UpdateStatusFunc.
-func (mock *OrderStoreMock) UpdateStatus(ctx context.Context, id uuid.UUID, status domain.OrderStatus) error {
+func (mock *OrderStoreMock) UpdateStatus(ctx context.Context, id uuid.UUID, status domain.OrderStatus, errorMessage *string) error {
 	if mock.UpdateStatusFunc == nil {
 		panic("OrderStoreMock.UpdateStatusFunc: method is nil but OrderStore.UpdateStatus was just called")
 	}
 	callInfo := struct {
-		Ctx    context.Context
-		ID     uuid.UUID
-		Status domain.OrderStatus
+		Ctx          context.Context
+		ID           uuid.UUID
+		Status       domain.OrderStatus
+		ErrorMessage *string
 	}{
-		Ctx:    ctx,
-		ID:     id,
-		Status: status,
+		Ctx:          ctx,
+		ID:           id,
+		Status:       status,
+		ErrorMessage: errorMessage,
 	}
 	mock.lockUpdateStatus.Lock()
 	mock.calls.UpdateStatus = append(mock.calls.UpdateStatus, callInfo)
 	mock.lockUpdateStatus.Unlock()
-	return mock.UpdateStatusFunc(ctx, id, status)
+	return mock.UpdateStatusFunc(ctx, id, status, errorMessage)
 }
 
 // UpdateStatusCalls gets all the calls that were made to UpdateStatus.
@@ -299,14 +303,16 @@ func (mock *OrderStoreMock) UpdateStatus(ctx context.Context, id uuid.UUID, stat
 //
 //	len(mockedOrderStore.UpdateStatusCalls())
 func (mock *OrderStoreMock) UpdateStatusCalls() []struct {
-	Ctx    context.Context
-	ID     uuid.UUID
-	Status domain.OrderStatus
+	Ctx          context.Context
+	ID           uuid.UUID
+	Status       domain.OrderStatus
+	ErrorMessage *string
 } {
 	var calls []struct {
-		Ctx    context.Context
-		ID     uuid.UUID
-		Status domain.OrderStatus
+		Ctx          context.Context
+		ID           uuid.UUID
+		Status       domain.OrderStatus
+		ErrorMessage *string
 	}
 	mock.lockUpdateStatus.RLock()
 	calls = mock.calls.UpdateStatus
